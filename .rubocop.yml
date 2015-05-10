@@ -1,0 +1,23 @@
+AllCops:
+  Exclude:
+    - '**/Gemfile'
+    - '**/*.gemspec'
+    - 'pkg/**/*'
+
+Style/RegexpLiteral:
+  Exclude:
+    - '**/Guardfile'
+
+Style/Documentation:
+  Exclude:
+    - 'spec/**/*.rb'
+
+Metrics/MethodLength:
+  Max: 15
+
+Metrics/ClassLength:
+  Max: 150
+
+Lint/UnusedMethodArgument:
+  Exclude:
+    - 'lib/chef-dk/template/mixin/*.rb'
