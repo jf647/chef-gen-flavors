@@ -3,7 +3,7 @@
 * home :: https://github.com/Nordstrom/chef-dk-template-plugin
 * license :: [Apache2](http://www.apache.org/licenses/LICENSE-2.0)
 * gem version :: [![Gem Version](https://badge.fury.io/rb/chef-dk-template-plugin.png)](http://badge.fury.io/rb/chef-dk-template-plugin)
-* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-dk-template-plugin.png?branch=master)](https://travis-ci.org/Nordstrom/chef-dk-template-plugins)
+* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-dk-template-plugin.png?branch=master)](https://travis-ci.org/Nordstrom/chef-dk-template-plugin)
 * code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-dk-template-plugin/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-dk-template-plugin
 
 ## DESCRIPTION
