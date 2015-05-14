@@ -59,7 +59,7 @@ plugin, it will be chosen instead of presenting a prompt:
 ## USING THE BUILT-IN CHEFDK TEMPLATE
 
 By default, this gem does not offer the built-in ChefDK template as an
-option. By setting the environment variable CHEFDK_BUILTIN_TEMPLATE, the
+option. By setting the environment variable CHEFDK_FLAVOR, the
 option `builtin` will be offered.
 
 ## TERMINOLOGY
