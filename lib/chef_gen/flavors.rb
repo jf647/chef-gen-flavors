@@ -1,13 +1,11 @@
 require 'little-plugger'
 
+require 'chef_gen/flavor'
+
 # chef generators
 module ChefGen
-  # creates the Flavor namespace for little-plugger to use
-  module Flavor
-  end
-
-  # a plugin framework for creating ChefDK generator templates (a 'Flavor')
-  class Template
+  # a plugin framework for creating ChefDK generator flavors
+  class Flavors
     # the version of the gem
     VERSION = '0.3.0'
 
@@ -29,7 +27,7 @@ module ChefGen
                    prompt_for_plugin ||
                    fail('no ChefGen flavors found!')
         path = generator_path(selected)
-        $stdout.puts "using ChefGen flavor in #{path}"
+        $stdout.puts "using ChefGen flavor '#{selected}' in #{path}"
         path
       end
 
@@ -47,24 +45,24 @@ module ChefGen
       end
 
       # checks if the plugin to use has been specified in the environment
-      # variable CHEFGEN_TEMPLATE
+      # variable CHEFGEN_FLAVOR
       # @return [Symbol,nil] the plugin if specified and found, nil otherwise
       # @api private
       def plugin_from_env
-        if ENV.key?('CHEFGEN_TEMPLATE')
-          candidate = ENV['CHEFGEN_TEMPLATE'].downcase.to_sym
+        if ENV.key?('CHEFGEN_FLAVOR')
+          candidate = ENV['CHEFGEN_FLAVOR'].downcase.to_sym
           return candidate if plugins.key?(candidate)
         end
         nil
       end
 
-      # if the environment variable CHEFDK_BUILTIN_TEMPLATE is defined, adds
+      # if the environment variable CHEFDK_FLAVOR is defined, adds
       # the built-in template that comes with ChefDK to the list of available
       # plugins
       # @return [void]
       # @api private
       def add_builtin_template
-        @plugins[:builtin] = true if ENV.key?('CHEFDK_BUILTIN_TEMPLATE')
+        @plugins[:builtin] = true if ENV.key?('CHEFDK_FLAVOR')
       end
 
       # returns the sole installed plugin if only one is found
@@ -98,7 +96,7 @@ module ChefGen
       # @return [Hash] a hash of valid options
       # @api private
       def plugin_selection(ui)
-        output = [ui.color('Available Templates', :bold)]
+        output = [ui.color('Flavors on the menu', :bold)]
         idx = 1
         valid = {}
         @plugins.each do |name, klass|

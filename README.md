@@ -1,19 +1,19 @@
-# chef-gen-template
+# chef-gen-flavors
 
-* home :: https://github.com/Nordstrom/chef-gen-template
+* home :: https://github.com/Nordstrom/chef-gen-flavors
 * license :: [Apache2](http://www.apache.org/licenses/LICENSE-2.0)
-* gem version :: [![Gem Version](https://badge.fury.io/rb/chef-gen-template.png)](http://badge.fury.io/rb/chef-gen-template)
-* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-gen-template.png?branch=master)](https://travis-ci.org/Nordstrom/chef-gen-template)
-* code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-gen-template/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-gen-template)
+* gem version :: [![Gem Version](https://badge.fury.io/rb/chef-gen-flavors.png)](http://badge.fury.io/rb/chef-gen-flavors)
+* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-gen-flavors.png?branch=master)](https://travis-ci.org/Nordstrom/chef-gen-flavors)
+* code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-gen-flavors/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-gen-flavors)
 
 ## DESCRIPTION
 
-chef-gen-template is a framework for creating custom templates for the
+chef-gen-flavors is a framework for creating custom templates for the
 'chef generate' command provided by ChefDK.
 
 This gem simply provides a framework; templates are provided by separate
 gems, which you can host privately for use within your organization or
-publically for the Chef community to use.
+publicly for the Chef community to use.
 
 At present this is focused primarily on providing templates for generation of
 cookbooks, as this is where most organization-specific customization takes place.
@@ -22,7 +22,7 @@ the focus of early releases.
 
 ## INSTALLATION
 
-    chef gem install chef-gen-template
+    chef gem install chef-gen-flavors
 
 You will also need to install at least one plugin, which may be distributed
 via Rubygems (in which case you install using `chef gem`) or as source, in
@@ -42,7 +42,7 @@ In your `knife.rb` file, add this snippet:
 
     unless chefdk.nil?
       require 'chef_gen/template'
-      chefdk.generator_cookbook = ChefGen::Template.path
+      chefdk.generator_cookbook = ChefGen::Flavors.path
     end
 
 When you run `chef generate`, all available plugins will be loaded. If more
@@ -66,7 +66,7 @@ option `builtin` will be offered.
 (because everything in the Chef ecosystem has to have foodie names)
 
 * Flavor - a type of template.  Provided by a plugin in the namespace `ChefGen::Flavor::`.  Flavors can be distributed as ruby gems inside or outside of your organization.
-* Snippet - a small piece of a code_generator cookbook that flavors can compose together to avoid repeating themselves.  Nominally provided by a module in the namespace `ChefGen::Snippet::`, but can be defined in any module.  chef-gen-template comes with several common snippets, but you can create your own and package them as standalone gems or as part of a flavor gem
+* Snippet - a small piece of a code_generator cookbook that flavors can compose together to avoid repeating themselves.  Nominally provided by a module in the namespace `ChefGen::Snippet::`, but can be defined in any module.  chef-gen-flavors comes with several common snippets, but you can create your own and package them as standalone gems or as part of a flavor gem
 
 ## FLAVORS
 
@@ -250,8 +250,8 @@ number of snippets, which can be included in your plugin class like so:
     require 'chef_gen/snippets'
 
     module ChefGen
-      module Template
-        class Amazing < Flavor
+      module Flavor
+        class Amazing < FlavorBase
           include ChefGen::Snippet::ChefSpec
         end
       end

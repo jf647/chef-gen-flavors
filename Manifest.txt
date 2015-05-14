@@ -9,7 +9,10 @@ LICENSE
 Manifest.txt
 README.md
 Rakefile
-chef-gen-template.gemspec
+chef-gen-flavors.gemspec
+lib/chef_gen/flavor.rb
+lib/chef_gen/flavor_base.rb
+lib/chef_gen/flavors.rb
 lib/chef_gen/snippet/attributes.rb
 lib/chef_gen/snippet/chef_spec.rb
 lib/chef_gen/snippet/cookbook_base.rb
@@ -21,8 +24,8 @@ lib/chef_gen/snippet/standard_ignore.rb
 lib/chef_gen/snippet/style_rubocop.rb
 lib/chef_gen/snippet/test_kitchen.rb
 lib/chef_gen/snippets.rb
-lib/chef_gen/template.rb
-lib/chef_gen/flavor.rb
+spec/lib/chef_gen/flavor_base_spec.rb
+spec/lib/chef_gen/flavors_spec.rb
 spec/lib/chef_gen/snippet/attributes_spec.rb
 spec/lib/chef_gen/snippet/chef_spec_spec.rb
 spec/lib/chef_gen/snippet/cookbook_base_spec.rb
@@ -33,8 +36,6 @@ spec/lib/chef_gen/snippet/resource_provider_spec.rb
 spec/lib/chef_gen/snippet/standard_ignore_spec.rb
 spec/lib/chef_gen/snippet/style_rubocop_spec.rb
 spec/lib/chef_gen/snippet/test_kitchen_spec.rb
-spec/lib/chef_gen/flavor_spec.rb
-spec/lib/chef_gen/template_spec.rb
 spec/spec_helper.rb
 spec/support/fixtures/code_generator/metadata.rb
 spec/support/fixtures/code_generator/recipes/cookbook.rb

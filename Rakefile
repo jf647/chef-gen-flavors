@@ -1,11 +1,11 @@
-require 'chef_gen/template'
+require 'chef_gen/flavors'
 
 begin
   require 'hoe'
   Hoe.plugin :gemspec
   Hoe.plugins.delete :test
-  Hoe.spec 'chef-gen-template' do |s|
-    s.version = ChefGen::Template::VERSION
+  Hoe.spec 'chef-gen-flavors' do |s|
+    s.version = ChefGen::Flavors::VERSION
     developer 'James FitzGibbon', 'james.i.fitzgibbon@nordstrom.com'
     license 'apache2'
     extra_deps << ['little-plugger', '~> 1.1']
