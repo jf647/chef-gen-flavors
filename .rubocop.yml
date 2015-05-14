@@ -20,4 +20,4 @@ Metrics/ClassLength:
 
 Lint/UnusedMethodArgument:
   Exclude:
-    - 'lib/chef-dk/template/mixin/*.rb'
+    - 'lib/chef_gen/snippet/*.rb'

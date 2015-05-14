@@ -1,14 +1,14 @@
-# chef-dk-template-plugin
+# chef-gen-template
 
-* home :: https://github.com/Nordstrom/chef-dk-template-plugin
+* home :: https://github.com/Nordstrom/chef-gen-template
 * license :: [Apache2](http://www.apache.org/licenses/LICENSE-2.0)
-* gem version :: [![Gem Version](https://badge.fury.io/rb/chef-dk-template-plugin.png)](http://badge.fury.io/rb/chef-dk-template-plugin)
-* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-dk-template-plugin.png?branch=master)](https://travis-ci.org/Nordstrom/chef-dk-template-plugin)
-* code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-dk-template-plugin/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-dk-template-plugin)
+* gem version :: [![Gem Version](https://badge.fury.io/rb/chef-gen-template.png)](http://badge.fury.io/rb/chef-gen-template)
+* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-gen-template.png?branch=master)](https://travis-ci.org/Nordstrom/chef-gen-template)
+* code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-gen-template/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-gen-template)
 
 ## DESCRIPTION
 
-chef-dk-template-plugin is a framework for creating custom templates for the
+chef-gen-template is a framework for creating custom templates for the
 'chef generate' command provided by ChefDK.
 
 This gem simply provides a framework; templates are provided by separate
@@ -22,7 +22,7 @@ the focus of early releases.
 
 ## INSTALLATION
 
-    chef gem install chef-dk-template-plugin
+    chef gem install chef-gen-template
 
 You will also need to install at least one plugin, which may be distributed
 via Rubygems (in which case you install using `chef gem`) or as source, in
@@ -41,8 +41,8 @@ provided by Chef, not as a gem.
 In your `knife.rb` file, add this snippet:
 
     unless chefdk.nil?
-      require 'chef-dk/template/plugin'
-      chefdk.generator_cookbook = ChefDK::Template::Plugin.path
+      require 'chef_gen/template'
+      chefdk.generator_cookbook = ChefGen::Template.path
     end
 
 When you run `chef generate`, all available plugins will be loaded. If more
@@ -50,18 +50,25 @@ than one plugin is found, you will be prompted as to which you want to use:
 
     $ chef generate cookbook my_app
 
-If you set the environment variable `CHEFDK_TEMPLATE` to the name of a
+If you set the environment variable `CHEFGEN_TEMPLATE` to the name of a
 plugin, it will be chosen instead of presenting a prompt:
 
-    $ CHEFDK_TEMPLATE=mytemplate chef generate cookbook my_app
+    $ CHEFGEN_TEMPLATE=mytemplate chef generate cookbook my_app
 
 ## USING THE BUILT-IN CHEFDK TEMPLATE
 
 By default, this gem does not offer the built-in ChefDK template as an
-option.  By setting the environment variable CHEFDK_TEMPLATE_BUILTIN, the
+option. By setting the environment variable CHEFDK_BUILTIN_TEMPLATE, the
 option `builtin` will be offered.
 
-## PLUGINS
+## TERMINOLOGY
+
+(because everything in the Chef ecosystem has to have foodie names)
+
+* Flavor - a type of template.  Provided by a plugin in the namespace `ChefGen::Flavor::`.  Flavors can be distributed as ruby gems inside or outside of your organization.
+* Snippet - a small piece of a code_generator cookbook that flavors can compose together to avoid repeating themselves.  Nominally provided by a module in the namespace `ChefGen::Snippet::`, but can be defined in any module.  chef-gen-template comes with several common snippets, but you can create your own and package them as standalone gems or as part of a flavor gem
+
+## FLAVORS
 
 This gem uses [little-plugger](https://rubygems.org/gems/little-plugger) to
 make adding template flavors easy. Each flavor is defined by a plugin named
@@ -69,7 +76,7 @@ using [little-pluggers's
 rules](https://github.com/TwP/little-plugger/blob/little-plugger-1.1.2/lib/little-plugger.rb#L13-25).
 
 The plugin must define a class inside the naming hierarchy
-`ChefDK::Template::`. The class name should be the filename converted to
+`ChefGen::Flavor::`. The class name should be the filename converted to
 CamelCase (e.g. `foo_bar.rb` = `FooBar`)
 
 The name of the module must not be in all caps, as little-plugger ignores
@@ -82,17 +89,17 @@ displayed when more than one plugin is available.
 You do not have to `require` your plugin; little-plugger searches all
 installed gems for files matching the globspec.
 
-## EXAMPLE PLUGIN STRUCTURE
+## EXAMPLE FLAVOR STRUCTURE
 
-This example defines a plugin named `Example`. It can only generate
+This example defines a flavor named `Example`. It can only generate
 cookbooks, as its code_generator cookbook contains no other recipes.
 
 A functional copy of this plugin is available on rubygems as
-`chef-dk-template-example`.
+`chef-gen-flavor-example`.
 
 The directory structure of a plugin looks like this:
 
-    chef-dk-template-example
+    chef-gen-flavor-example
     ├── code_generator
     │   ├── files
     │   │   └── default
@@ -102,15 +109,14 @@ The directory structure of a plugin looks like this:
     │   └── templates
     │       └── default
     └── lib
-        └── chef-dk
-            └── template
-                └── plugin
-                    └── example.rb
+        └── chef_gen
+            └── flavor
+                └── example.rb
 
 ## ALTERNATE code_generator PATHS
 
 By default, the code_generator cookbook is assumed to live in a directory
-named `code_generator` five levels higher than the path of the file
+named `code_generator` four levels higher than the path of the file
 definining the plugin.
 
 To specify that the code_generator cookbook lives elsewhere, define a class
@@ -120,24 +126,22 @@ plugin class) and returns the path to the code_generator cookbook. If the
 named `template` instead of `code_generator`, it would define an instance
 method like this:
 
-    module ChefDK
-      module Template
-        class Plugin
-          class Example
-            class << self
-              def description
-                'example cookbook template'
-              end
+    module ChefGen
+      module Flavor
+        class Example
+          class << self
+            def description
+              'example cookbook template'
+            end
 
-              def code_generator_path(classfile)
-                File.expand_path(
-                  File.join(
-                    classfile,
-                    '..', '..', '..', '..',
-                    'template'
-                  )
+            def code_generator_path(classfile)
+              File.expand_path(
+                File.join(
+                  classfile,
+                  '..', '..', '..', '..',
+                  'template'
                 )
-              end
+              )
             end
           end
         end
@@ -148,7 +152,7 @@ For compatibility with all platforms supported by ChefDK, plugins should use
 the methods in the `File` class to construct relative paths rather than
 assuming what the path separator should be.
 
-## PLUGIN BASE CLASS
+## FLAVOR BASE CLASS
 
 Inside of your plugin's code_generator cookbook, you can do anything that
 chef-solo can do. If you aren't familiar with the mechanics of the default
@@ -161,18 +165,16 @@ base class that plugins can inherit from. This provides some useful
 features:
 
 * helpers to create directories and render files and templates using simple name translation
-* the ability to create and use mixins that set up commonly used functionality (i.e. ChefSpec or Test Kitchen)
+* the ability to create and use snippets that set up commonly used functionality (i.e. ChefSpec or Test Kitchen)
 * the ability to prevent files from being overwritten when a template is being applied overtop an existing cookbook
 
 To use the base class, make it a dependency of your gem and inherit from it:
 
-    require 'chef-dk/template/plugin_base'
+    require 'chef_gen/flavor_base'
 
-    module ChefDK
-      module Template
-        class Plugin
-          class Amazing < PluginBase
-          end
+    module ChefGen
+      module Flavor
+        class Amazing < FlavorBase
         end
       end
     end
@@ -181,7 +183,7 @@ Then in one of your generator recipes like `recipes/cookbook.rb`, create
 an instance of your plugin, passing the recipe into which resources will
 be injected:
 
-    template = ChefDK::Template::Plugin::Amazing.new(self)
+    template = ChefGen::Flavor::Amazing.new(self)
 
 The plugin has several helper methods you can use:
 
@@ -219,7 +221,7 @@ Additionally, templates have `.erb` appended to the source.
 
 This code:
 
-    template = ChefDK::Template::Plugin::Amazing.new
+    template = ChefGen::Flavor::Amazing.new
     template.files << 'spec/spec_helper.rb'
     template.templates << '.rubocop.yml'
     template.generate
@@ -234,7 +236,7 @@ is equivalent to manually creating these resources:
       source '_rubocop_yml.erb'
     end
 
-### TEMPLATE MIXINS
+### TEMPLATE SNIPPETS
 
 Many templates will use common patterns, such as providing a README.md and
 CHANGELOG.md, providing the files necessary to create a ChefSpec unit
@@ -242,22 +244,20 @@ testing suite, or the files necessary to create a Test Kitchen integration
 testing suite.
 
 Rather than have every template author create these, this gem ships with a
-number of mixins, which can be included in your plugin class like so:
+number of snippets, which can be included in your plugin class like so:
 
-    require 'chef-dk/template/plugin_base'
-    require 'chef-dk/template/mixins'
+    require 'chef_gen/flavor'
+    require 'chef_gen/snippets'
 
-    module ChefDK
+    module ChefGen
       module Template
-        class Plugin
-          class Amazing < PluginBase
-            include ChefDK::Template::Mixin::ChefSpec
-          end
+        class Amazing < Flavor
+          include ChefGen::Snippet::ChefSpec
         end
       end
     end
 
-The mixins that ship with this gem are:
+The snippets that ship with this gem are:
 
 * `CookbookBase` - sets up the basic files any cookbook needs (README, CHANGELOG, etc.)
 * `StyleRubocop` - sets up the files for style checking with Rubocop
@@ -269,23 +269,21 @@ The mixins that ship with this gem are:
 * `ExampleTemplate` - creates templates/default/example.conf.erb
 * `ResourceProvider` - sets up a sample LWRP resource and provider
 
-You can also create your own mixins. A mixin is simply a module that
-provides some number of public methods prefixed with `mixin\_`. Any such
+You can also create your own snippet. A snippet is simply a module that
+provides some number of public methods prefixed with `snippet\_`. Any such
 methods will be called, passing the recipe object as the only parameter when
-`#generate` is called. For example, a simplified ChefSpec mixin might look
+`#generate` is called. For example, a simplified ChefSpec snippet might look
 like this:
 
-    module ChefDK
-      module Template
-        module Mixin
-          module ChefSpec
-            def mixin_chefspec(recipe)
-              @directories << 'spec'
-              @directories << File.join('spec', '/recipes')
-              @files << '.rspec'
-              @files << File.join('spec', 'spec_helper.rb')
-              @files << File.join('spec', 'recipes', 'default_spec.rb')
-            end
+    module ChefGen
+      module Snippet
+        module ChefSpec
+          def snippet_chefspec(recipe)
+            @directories << 'spec'
+            @directories << File.join('spec', '/recipes')
+            @files << '.rspec'
+            @files << File.join('spec', 'spec_helper.rb')
+            @files << File.join('spec', 'recipes', 'default_spec.rb')
           end
         end
       end
