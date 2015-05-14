@@ -1,11 +1,11 @@
-require 'chef-dk/template/plugin'
+require 'chef_gen/flavors'
 
 begin
   require 'hoe'
   Hoe.plugin :gemspec
   Hoe.plugins.delete :test
-  Hoe.spec 'chef-dk-template-plugin' do |s|
-    s.version = ChefDK::Template::Plugin::VERSION
+  Hoe.spec 'chef-gen-flavors' do |s|
+    s.version = ChefGen::Flavors::VERSION
     developer 'James FitzGibbon', 'james.i.fitzgibbon@nordstrom.com'
     license 'apache2'
     extra_deps << ['little-plugger', '~> 1.1']
@@ -69,7 +69,7 @@ begin
   require 'yard'
   require 'yard/rake/yardoc_task'
   YARD::Rake::YardocTask.new(:doc) do |t|
-    t.options = ['--private']
+    t.options = ['-m', 'markdown', '--private']
     t.stats_options = ['--list-undoc']
   end
 rescue LoadError
