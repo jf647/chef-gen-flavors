@@ -7,7 +7,7 @@ module ChefGen
   # a plugin framework for creating ChefDK generator flavors
   class Flavors
     # the version of the gem
-    VERSION = '0.3.0'
+    VERSION = '0.4.0'
 
     extend LittlePlugger path: 'chef_gen/flavor',
                          module: ChefGen::Flavor
@@ -17,8 +17,6 @@ module ChefGen
       # the selected ChefGen Flavor
       # @return [String] the path to the code_generator cookbook
       def path
-        # validate what LittlePlugger found
-        validate_plugins
         # then take a copy so we can augment it
         @plugins = plugins.dup
         add_builtin_template
@@ -32,17 +30,6 @@ module ChefGen
       end
 
       private
-
-      # validates all plugins found by LittlePlugger
-      # @raise RuntimeError if any plugin is invalid
-      # @return [void]
-      # @api private
-      def validate_plugins
-        plugins.each do |name, klass|
-          fail "no description for plugin #{name}" \
-            unless klass.respond_to?(:description)
-        end
-      end
 
       # checks if the plugin to use has been specified in the environment
       # variable CHEFGEN_FLAVOR
@@ -104,7 +91,8 @@ module ChefGen
           if true == klass
             output << "#{idx}. ChefDK built-in template"
           else
-            output << "#{idx}. #{name}: #{klass.description}"
+            descr = klass.respond_to?(:description) ? klass.description : ''
+            output << "#{idx}. #{name}: #{descr}"
           end
           idx += 1
         end
