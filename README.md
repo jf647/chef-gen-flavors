@@ -41,8 +41,9 @@ provided by Chef, not as a gem.
 
 In your `knife.rb` file, add this snippet:
 
-    unless chefdk.nil?
-      require 'chef_gen/template'
+    # only load ChefGen::Flavors if we're being called from the ChefDK CLI
+    if defined?(ChefDK::CLI)
+      require 'chef_gen/flavors'
       chefdk.generator_cookbook = ChefGen::Flavors.path
     end
 
