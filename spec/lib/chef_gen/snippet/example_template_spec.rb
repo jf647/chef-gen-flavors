@@ -19,13 +19,8 @@ end
 
 # rubocop:disable Style/RegexpLiteral
 RSpec.describe ChefGen::Snippet::ExampleTemplate do
-  before do
-    @ctx = double('ChefDK generator context')
-    allow(@ctx).to receive(:cookbook_root).and_return('/nonexistent')
-    allow(@ctx).to receive(:cookbook_name).and_return('foo')
-    allow(ChefDK::Generator).to receive(:context).and_return(@ctx)
-    @recipe = double('Chef recipe').as_null_object
-  end
+  include ChefDKGeneratorContext
+  include DummyRecipe
 
   %w(templates templates/default).each do |dname|
     it "should create the directory #{dname}" do

@@ -18,13 +18,8 @@ module ChefGen
 end
 
 RSpec.describe ChefGen::Snippet::StyleRubocop do
-  before do
-    @ctx = double('ChefDK generator context')
-    allow(@ctx).to receive(:cookbook_root).and_return('/nonexistent')
-    allow(@ctx).to receive(:cookbook_name).and_return('foo')
-    allow(ChefDK::Generator).to receive(:context).and_return(@ctx)
-    @recipe = double('Chef recipe').as_null_object
-  end
+  include ChefDKGeneratorContext
+  include DummyRecipe
 
   %w(.rubocop.yml).each do |fname|
     it "should add a template for #{fname}" do
