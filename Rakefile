@@ -22,6 +22,7 @@ begin
     extra_dev_deps << ['simplecov', '~> 0.9']
     extra_dev_deps << ['simplecov-console', '~> 0.2']
     extra_dev_deps << ['yard', '~> 0.8']
+    extra_dev_deps << ['aruba', '~> 0.6']
   end
   # re-generate our gemspec before packaging
   task package: 'gem:spec'
@@ -64,6 +65,17 @@ rescue LoadError
   task :test
 end
 
+# Feature Tests
+begin
+  require 'cucumber'
+  require 'cucumber/rake/task'
+  Cucumber::Rake::Task.new(:features)
+rescue LoadError
+  puts 'Cucumber/Aruba not available; disabling feature tasks'
+  # create a no-op spec task for :default
+  task :features
+end
+
 # Documentation
 begin
   require 'yard'
@@ -76,9 +88,9 @@ rescue LoadError
   puts 'yard not available; disabling tasks'
 end
 
-# test is an alias for spec
-desc 'runs unit tests'
-task test: [:spec]
+# test is an alias for spec and features
+desc 'runs unit and feature tests'
+task test: [:spec, :features]
 
 # default is to test everything
 desc 'runs all tests'

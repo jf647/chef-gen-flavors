@@ -10,7 +10,7 @@ module ChefGen
         c = generator_context
         recipe.send(:execute, 'initialize git repo') do
           command('git init .')
-          cwd target_path
+          cwd @target_path
         end if c.have_git && !c.skip_git_init
       end
     end
