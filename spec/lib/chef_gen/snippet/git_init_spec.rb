@@ -4,7 +4,7 @@ require 'chef_gen/snippets'
 module ChefGen
   module Flavor
     class Awesome < FlavorBase
-      include ChefGen::Snippet::StandardIgnore
+      include ChefGen::Snippet::GitInit
 
       class << self
         # :nocov:
@@ -17,18 +17,13 @@ module ChefGen
   end
 end
 
-RSpec.describe ChefGen::Snippet::StandardIgnore do
+# rubocop:disable Style/RegexpLiteral
+RSpec.describe ChefGen::Snippet::GitInit do
   include ChefDKGeneratorContext
   include DummyRecipe
 
-  it 'should create a chefignore file' do
-    expect(@recipe).to receive(:file).with(/chefignore$/)
-    template = ChefGen::Flavor::Awesome.new(@recipe)
-    template.generate
-  end
-
-  it 'should create a .gitignore file' do
-    expect(@recipe).to receive(:file).with(/\.gitignore$/)
+  it 'should execute git init' do
+    expect(@recipe).to receive(:execute).with('initialize git repo')
     template = ChefGen::Flavor::Awesome.new(@recipe)
     template.generate
   end

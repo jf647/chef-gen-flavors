@@ -6,6 +6,8 @@ require 'support/fixtures/lib/chef_gen/flavor/bar'
 require 'support/fixtures/lib/chef_gen/flavor/baz'
 
 RSpec.describe ChefGen::Flavors do
+  include ChefDKGeneratorContext
+
   before do
     ChefGen::Flavors.clear_plugins
     ENV.delete('CHEFGEN_FLAVOR')

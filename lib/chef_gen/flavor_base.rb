@@ -56,7 +56,7 @@ module ChefGen
       @recipe = recipe
 
       # derive our target path
-      ctx = ChefDK::Generator.context
+      ctx = generator_context
       @target_path = File.expand_path(
         File.join(ctx.cookbook_root, ctx.cookbook_name)
       )
@@ -72,10 +72,16 @@ module ChefGen
       end
     end
 
+    # a proxy to ChefDK's generator context
+    # @return [ChefDK::Generator::Context]
+    def generator_context
+      ChefDK::Generator.context
+    end
+
     # generates the Chef resources that the plugin has declared
     # @return [void]
     def generate
-      run_mixins
+      run_snippets
       add_directories
       add_files
       add_templates
@@ -108,7 +114,7 @@ module ChefGen
     # @yield [Chef::Recipe] the recipe into which the mixin can inject
     #   resources
     # @api private
-    def run_mixins
+    def run_snippets
       snippets = public_methods.select do |m|
         m.to_s =~ /^snippet_/
       end

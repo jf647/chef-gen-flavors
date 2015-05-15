@@ -11,5 +11,6 @@ module ChefGen
     autoload :StandardIgnore, 'chef_gen/snippet/standard_ignore'
     autoload :StyleRubocop, 'chef_gen/snippet/style_rubocop'
     autoload :TestKitchen, 'chef_gen/snippet/test_kitchen'
+    autoload :GitInit, 'chef_gen/snippet/git_init'
   end
 end

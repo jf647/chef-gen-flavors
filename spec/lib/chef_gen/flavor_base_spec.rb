@@ -22,12 +22,10 @@ end
 # :nocov:
 
 RSpec.describe ChefGen::FlavorBase do
+  include ChefDKGeneratorContext
+  include DummyRecipe
+
   before do
-    @ctx = double('ChefDK generator context')
-    allow(@ctx).to receive(:cookbook_root).and_return('/nonexistent')
-    allow(@ctx).to receive(:cookbook_name).and_return('foo')
-    allow(ChefDK::Generator).to receive(:context).and_return(@ctx)
-    @recipe = double('Chef recipe').as_null_object
     @orig_stdout = $stdout
     $stdout = File.open(File::NULL, 'w')
   end
@@ -160,5 +158,10 @@ RSpec.describe ChefGen::FlavorBase do
     template.report_actions = false
     template.next_steps = 'do something amazing'
     template.generate
+  end
+
+  it 'proxies to the ChefDK generator context' do
+    template = ChefGen::Flavor::Amazing.new(@recipe)
+    template.generator_context
   end
 end
