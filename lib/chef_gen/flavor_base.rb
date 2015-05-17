@@ -64,7 +64,7 @@ module ChefGen
       # set defaults
       @report_actions = true
       @fail_on_clobber = !ctx.respond_to?(:clobber)
-      @directories = [''] # root directory
+      @directories = []
       %w(files files_if_missing templates templates_if_missing
          chefignore_files gitignore_files actions_taken failures)
         .each do |varname|
@@ -81,6 +81,7 @@ module ChefGen
     # generates the Chef resources that the plugin has declared
     # @return [void]
     def generate
+      add_target_path
       run_snippets
       add_directories
       add_files
@@ -107,6 +108,13 @@ module ChefGen
     end
 
     private
+
+    # creates a directory resource for the target
+    # @return [void]
+    def add_target_path
+      @recipe.send(:directory, @target_path)
+      @actions_taken << "create directory #{@target_path}"
+    end
 
     # find all public methods of the plugin starting with snippet_
     # and calls them
