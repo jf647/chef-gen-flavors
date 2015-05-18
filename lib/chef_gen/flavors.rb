@@ -7,7 +7,7 @@ module ChefGen
   # a plugin framework for creating ChefDK generator flavors
   class Flavors
     # the version of the gem
-    VERSION = '0.4.1'
+    VERSION = '0.5.0'
 
     extend LittlePlugger path: 'chef_gen/flavor',
                          module: ChefGen::Flavor

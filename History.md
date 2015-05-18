@@ -1,5 +1,9 @@
 # Changelog for chef-gen-template
 
+## 0.5.0
+
+* provide some helpful Aruba step definitions for flavors to use in feature tests
+
 ## 0.4.1
 
 * declare the target path 'directory' before running snippets, which fixes the GitInit snippet trying to run in a directory that hasn't been created yet

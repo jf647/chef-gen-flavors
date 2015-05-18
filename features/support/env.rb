@@ -3,6 +3,7 @@ if ENV['COVERAGE']
 end
 
 require 'aruba/cucumber'
+require 'chef_gen/flavors/cucumber'
 
 # Travis runs tests in a limited environment which takes a long time to invoke
 # the knife command.  Up the timeout when we're in a travis build based on the

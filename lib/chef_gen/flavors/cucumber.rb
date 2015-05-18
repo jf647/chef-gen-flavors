@@ -1,0 +1,6 @@
+require 'chef_gen/flavors/cucumber/bundle'
+require 'chef_gen/flavors/cucumber/chefdk'
+require 'chef_gen/flavors/cucumber/kitchen'
+require 'chef_gen/flavors/cucumber/knife'
+require 'chef_gen/flavors/cucumber/rake'
+require 'chef_gen/flavors/cucumber/regex'

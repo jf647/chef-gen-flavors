@@ -291,6 +291,19 @@ like this:
       end
     end
 
+## FEATURE TESTING FLAVORS
+
+chef-gen-flavors provides a number of useful step definitions for Aruba (a CLI
+driver for Cucumber) to make it easier to test flavors.  To access these definitions,
+add the following line to your `features/support/env.rb` file:
+
+    require 'chef_gen/flavors/cucumber'
+
+For an example of how to use these steps in your features, refer to the reference
+implementation of a flavor: [chef-gen-flavor-example](https://github.com/Nordstrom/chef-gen-flavor-example).
+
+Documentation for the steps themselves is in the file `ARUBA_STEPS.md`
+
 ## AUTHOR
 
 James FitzGibbon - james.i.fitzgibbon@nordstrom.com - Nordstrom, Inc.
