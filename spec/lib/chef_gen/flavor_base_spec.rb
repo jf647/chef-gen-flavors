@@ -130,7 +130,7 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'calls mixin methods' do
-    expect(@recipe).to receive(:directory).with(%r{foo$})
+    expect(@recipe).to receive(:directory).with(/foo$/)
     expect(@recipe).to receive(:directory).with(%r{foo/bar$})
     template = ChefGen::Flavor::Amazing.new(@recipe)
     template.extend ChefGen::Snippet::Bar

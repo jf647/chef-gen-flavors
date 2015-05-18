@@ -10,7 +10,7 @@ Feature: chef generate
       |----------------|----------------------------------|
       | CHEFGEN_FLAVOR | bar                              |
       | RUBYLIB        | ../../spec/support/fixtures/lib |
-    When I generate a cookbook named 'foo'
+    When I generate a cookbook named "foo"
     Then the exit status should be 0
     And the output should match /using ChefGen flavor 'bar'/
     And the output should match /Recipe: code_generator_2::cookbook/

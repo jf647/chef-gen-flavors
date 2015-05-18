@@ -21,3 +21,7 @@ Metrics/ClassLength:
 Lint/UnusedMethodArgument:
   Exclude:
     - 'lib/chef_gen/snippet/*.rb'
+
+Metrics/LineLength:
+  Exclude:
+    - 'lib/chef_gen/flavors/cucumber/*.rb'
