@@ -1,5 +1,9 @@
 # Changelog for chef-gen-template
 
+## 0.4.1
+
+* declare the target path 'directory' before running snippets, which fixes the GitInit snippet trying to run in a directory that hasn't been created yet
+
 ## 0.4.0
 
 * added a GitInit snippet that runs 'git init .'

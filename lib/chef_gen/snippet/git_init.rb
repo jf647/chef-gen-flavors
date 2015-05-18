@@ -8,9 +8,10 @@ module ChefGen
       # @return [void]
       def snippet_gitinit(recipe)
         c = generator_context
+        target_path = @target_path
         recipe.send(:execute, 'initialize git repo') do
           command('git init .')
-          cwd @target_path
+          cwd target_path
         end if c.have_git && !c.skip_git_init
       end
     end
