@@ -103,14 +103,30 @@ RSpec.describe ChefGen::Flavors do
   it 'should default the code_generator path' do
     ChefGen::Flavors.disregard_plugin :baz
     ENV['CHEFGEN_FLAVOR'] = 'Foo'
-    expect(ChefGen::Flavors.path)
-      .to match(%r{spec/support/fixtures/code_generator$})
+    expect(FileUtils).to receive(:cp_r).with(
+      %r{spec/support/fixtures/code_generator$}, String
+    )
+    ChefGen::Flavors.path
   end
 
   it 'should respect an overridden code_generator path' do
     ChefGen::Flavors.disregard_plugin :baz
     ENV['CHEFGEN_FLAVOR'] = 'Bar'
+    expect(FileUtils).to receive(:cp_r).with(
+      %r{spec/support/fixtures/code_generator_2$}, String
+    )
+    ChefGen::Flavors.path
+  end
+
+  it 'should copy the code_generator to a temp directory' do
+    ChefGen::Flavors.disregard_plugin :baz
+    ENV['CHEFGEN_FLAVOR'] = 'Foo'
+    tmpdir = Dir.tmpdir
+    expect(FileUtils).to receive(:cp_r).with(
+      %r{spec/support/fixtures/code_generator$},
+      %r{#{tmpdir}/chefgen_flavor\..+$}
+    )
     expect(ChefGen::Flavors.path)
-      .to match(%r{spec/support/fixtures/code_generator_2$})
+      .to match(%r{#{tmpdir}/chefgen_flavor\..+$})
   end
 end

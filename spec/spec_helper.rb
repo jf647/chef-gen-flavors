@@ -49,6 +49,7 @@ module ChefDKGeneratorContext
     allow(@ctx).to receive(:cookbook_name).and_return('foo')
     allow(@ctx).to receive(:have_git).and_return(true)
     allow(@ctx).to receive(:skip_git_init).and_return(false)
+    allow(@ctx).to receive(:generator_path=)
     allow(ChefDK::Generator).to receive(:context).and_return(@ctx)
   end
 end

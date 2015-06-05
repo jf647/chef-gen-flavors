@@ -115,6 +115,12 @@ The directory structure of a plugin looks like this:
             └── flavor
                 └── example.rb
 
+It is important that the name of the directory in which your generator
+cookbook lives matches the name in metadata.rb.  ChefDK uses the last
+element of the path as the cookbook name, so if you put your cookbook
+in a folder called 'cookbook' but your metadata.rb declares the name
+as 'code_generator', ChefDK won't be able to find your recipe.
+
 ## ALTERNATE code_generator PATHS
 
 By default, the code_generator cookbook is assumed to live in a directory
@@ -153,6 +159,21 @@ method like this:
 For compatibility with all platforms supported by ChefDK, plugins should use
 the methods in the `File` class to construct relative paths rather than
 assuming what the path separator should be.
+
+## GENERATOR PATH COPY
+
+When #path is called, chef-gen-flavors makes a copy of the selected
+generator cookbook to a temporary path, which is what gets returned
+and used by ChefDK.  This path is cleaned up at exit unless the environment
+variable CHEFGEN_NOCLEANTMP is set.
+
+This temporary path is set as an attribute in the ChefDK Generator
+context, and can be retrieved in a flavor by calling
+
+    ChefDK::Generator.context.generator_path
+
+This is foundational work to allow snippets to include content as well
+as declarations of what files they will render.
 
 ## FLAVOR BASE CLASS
 
