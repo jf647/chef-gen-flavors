@@ -1,5 +1,9 @@
 # Changelog for chef-gen-flavors
 
+## 0.6.2
+
+* sort flavors alphabetically (suggested by @echohack)
+
 ## 0.6.1
 
 * remove leftover debugging statements about copy of generator cookbook
