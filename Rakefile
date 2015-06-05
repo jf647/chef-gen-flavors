@@ -23,6 +23,7 @@ begin
     extra_dev_deps << ['simplecov-console', '~> 0.2']
     extra_dev_deps << ['yard', '~> 0.8']
     extra_dev_deps << ['aruba', '~> 0.6']
+    extra_dev_deps << ['rspec_junit_formatter', '~> 0.2']
   end
   # re-generate our gemspec before packaging
   task package: 'gem:spec'
