@@ -1,5 +1,9 @@
 # Changelog for chef-gen-flavors
 
+## 0.6.1
+
+* remove leftover debugging statements about copy of generator cookbook
+
 ## 0.6.0
 
 * copy the contents of the code generator to a temporary path.  This is foundational work for allow snippets to include content as well as resource declarations
