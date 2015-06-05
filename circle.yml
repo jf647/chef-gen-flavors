@@ -1,0 +1,9 @@
+---
+machine:
+  ruby:
+    version: 2.2.0
+test:
+  override:
+    - mkdir -p $CIRCLE_TEST_REPORTS/cucumber $CIRCLE_TEST_REPORTS/rspec
+    - bundle exec rspec --format RspecJunitFormatter --out $CIRCLE_TEST_REPORTS/rspec/rspec.xml
+    - bundle exec cucumber --format json --out $CIRCLE_TEST_REPORTS/cucumber/tests.cucumber

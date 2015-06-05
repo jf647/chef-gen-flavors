@@ -8,7 +8,7 @@ module ChefGen
   # a plugin framework for creating ChefDK generator flavors
   class Flavors
     # the version of the gem
-    VERSION = '0.6.0'
+    VERSION = '0.6.1'
 
     extend LittlePlugger path: 'chef_gen/flavor',
                          module: ChefGen::Flavor
@@ -29,7 +29,6 @@ module ChefGen
         $stdout.puts "using ChefGen flavor '#{selected}' in #{path}"
         copy = copy_generator_dir(path, selected)
         ChefDK::Generator.add_attr_to_context('generator_path', copy)
-        $stdout.puts "using copy of generator in #{copy}"
         copy
       end
 
@@ -170,10 +169,8 @@ module ChefGen
       def copy_generator_dir(srcdir, selected)
         dstdir = Dir.mktmpdir('chefgen_flavor.')
         at_exit {
-          $stdout.puts "cleaning up generator copy in ${dstdir}"
           FileUtils.rm_rf(dstdir)
         } unless ENV.key?('CHEFGEN_NOCLEANTMP')
-        $stdout.puts "copying #{srcdir} to #{dstdir}"
         FileUtils.cp_r(srcdir, dstdir)
         File.join(dstdir, File.basename(srcdir))
       end
