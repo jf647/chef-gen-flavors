@@ -1,4 +1,8 @@
-# Changelog for chef-gen-template
+# Changelog for chef-gen-flavors
+
+## 0.6.0
+
+* copy the contents of the code generator to a temporary path.  This is foundational work for allow snippets to include content as well as resource declarations
 
 ## 0.5.0
 
