@@ -11,14 +11,6 @@ module ChefGen
     # @return [Array] list of directories
     attr_reader :directories
 
-    # the file patterns to write to the chefignore files
-    # @return [Array] list of file patterns
-    attr_reader :chefignore_files
-
-    # the file patterns to add to .gitignore
-    # @return [Array] list of file patterns
-    attr_reader :gitignore_files
-
     # files to create unconditionally
     # @return [Array] list of destination filenames
     attr_reader :files
@@ -65,11 +57,38 @@ module ChefGen
       @report_actions = true
       @fail_on_clobber = !ctx.respond_to?(:clobber)
       @directories = []
-      %w(files files_if_missing templates templates_if_missing
-         chefignore_files gitignore_files actions_taken failures)
-        .each do |varname|
+      %w(directories files files_if_missing templates
+         templates_if_missing actions_taken failures).each do |varname|
         instance_variable_set("@#{varname}".to_sym, [])
       end
+
+      # call initializers defined by snippets
+      methods_by_pattern(/^init_/).each do |m|
+        send(m)
+      end
+    end
+
+    # find all public methods of the flavor starting with content_
+    # and calls them, passing the path as the sole parameter
+    # @param path [String] the path to the copy of the generator cookbook
+    # @return [void]
+    def add_content(path)
+      methods_by_pattern(/^content_/).each do |m|
+        send(m, path)
+      end
+    end
+
+    # copy a snippet content file to the temporary generator path,
+    # creating the destination directory if it does not already exist
+    # @param src [String] the source file
+    # @param dst [String] the destination file
+    # @return [void]
+    def copy_snippet_file(src, dst)
+      # make sure the parent of the destination exists
+      parent = File.dirname(dst)
+      FileUtils.mkpath(parent) unless Dir.exist?(parent)
+      # copy the file
+      FileUtils.copy_file(src, dst)
     end
 
     # a proxy to ChefDK's generator context
@@ -83,6 +102,7 @@ module ChefGen
     def generate
       add_target_path
       run_snippets
+      after_run_snippets if respond_to?(:after_run_snippets)
       add_directories
       add_files
       add_templates
@@ -90,8 +110,6 @@ module ChefGen
         @failures.each { |f| $stderr.puts f }
         fail 'errors during generation'
       end
-      build_ignore('.gitignore', @gitignore_files)
-      build_ignore('chefignore', @chefignore_files)
       report_actions_taken(@actions_taken) \
         if @report_actions && @actions_taken
       display_next_steps(@next_steps) if @next_steps
@@ -116,18 +134,24 @@ module ChefGen
       @actions_taken << "create directory #{@target_path}"
     end
 
-    # find all public methods of the plugin starting with snippet_
+    # find all public methods of the flavor starting with snippet_
     # and calls them
     # @return [void]
     # @yield [Chef::Recipe] the recipe into which the mixin can inject
     #   resources
     # @api private
     def run_snippets
-      snippets = public_methods.select do |m|
-        m.to_s =~ /^snippet_/
-      end
-      snippets.each do |m|
+      methods_by_pattern(/^snippet_/).each do |m|
         send(m, @recipe)
+      end
+    end
+
+    # returns a list of public methods that match a pattern
+    # @param pattern [Regexp] the pattern to match methods against
+    # @return [Array] a list of sorted methods
+    def methods_by_pattern(pattern)
+      public_methods.select do |m|
+        m.to_s =~ pattern
       end
     end
 
@@ -195,22 +219,6 @@ module ChefGen
           @actions_taken << "create file #{dst}"
         end
       end
-    end
-
-    # creates a .gitignore or chefignore file
-    # @param dstfile [String] the destination file
-    # @param files [Array] an array of lines to write to the file
-    # @return [void]
-    # @api private
-    def build_ignore(dstfile, files)
-      return if files.empty?
-      dst = File.join(@target_path, dstfile)
-      @recipe.send(:file, dst) do
-        # :nocov:
-        content files.flatten.join("\n")
-        # :nocov:
-      end
-      @actions_taken << "create ignore file #{dst}"
     end
 
     # reports on the actions taken by the plugin

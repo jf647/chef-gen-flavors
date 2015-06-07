@@ -1,0 +1,7 @@
+<% @sources.each do |source| -%>
+source '<%= source %>'
+<% end -%>
+
+<% @gems.each do |gem, constraint| -%>
+gem '<%= gem %>', '<%= constraint %>'
+<% end -%>

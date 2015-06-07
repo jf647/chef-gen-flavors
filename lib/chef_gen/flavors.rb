@@ -8,7 +8,7 @@ module ChefGen
   # a plugin framework for creating ChefDK generator flavors
   class Flavors
     # the version of the gem
-    VERSION = '0.6.2'
+    VERSION = '0.7.0'
 
     extend LittlePlugger path: 'chef_gen/flavor',
                          module: ChefGen::Flavor
@@ -18,7 +18,7 @@ module ChefGen
       # for the selected ChefGen Flavor
       # @return [String] the path to the code_generator cookbook
       def path
-        # then take a copy so we can augment it
+        # select the plugin to use
         @plugins = plugins.dup
         add_builtin_template
         selected = plugin_from_env ||
@@ -27,12 +27,26 @@ module ChefGen
                    fail('no ChefGen flavors found!')
         path = generator_path(selected)
         $stdout.puts "using ChefGen flavor '#{selected}' in #{path}"
-        copy = copy_generator_dir(path, selected)
-        ChefDK::Generator.add_attr_to_context('generator_path', copy)
+        # take a copy so we can augment it
+        copy = copy_generator_dir(path)
+        # augment the copy if the plugin has hooks
+        run_content_hooks(selected, copy)
+        # return the path to the copy
         copy
       end
 
       private
+
+      # call content hooks in the flavor if it has any
+      # @param selected [Symbol] the selected flavor
+      # @param path [String] the temporary generator cookbook path
+      # @return [void]
+      def run_content_hooks(selected, path)
+        flavor_klass = @plugins[selected]
+        return unless flavor_klass.is_a?(Class)
+        return unless flavor_klass.instance_methods.include?(:add_content)
+        @plugins[selected].new(nil).add_content(path)
+      end
 
       # checks if the plugin to use has been specified in the environment
       # variable CHEFGEN_FLAVOR
@@ -94,15 +108,25 @@ module ChefGen
           if true == klass
             output << "#{idx}. ChefDK built-in template"
           else
-            descr = klass.respond_to?(:description) ? klass.description : ''
-            version = klass.const_defined?(:VERSION) ? "v#{klass.const_get(:VERSION, false)}" : ''
-            output << "#{idx}. #{name}: #{descr} #{version}"
+            output << "#{idx}. #{name}: #{plugin_descr(klass)}"
           end
           idx += 1
         end
         ui.info "#{output.join("\n")}\n"
         valid
       end
+
+      # builds the description of a flavor for the menu
+      # @param klass [Class] the class of the flavor
+      # @return [String] the flavor description with version if available
+      def plugin_descr(klass)
+        descr = klass.respond_to?(:description) ? klass.description : ''
+        if klass.const_defined?(:VERSION)
+          descr += " v#{klass.const_get(:VERSION, false)}"
+        end
+        descr
+      end
+
       # :nocov:
 
       # returns the path to the code_generator cookbook for the
@@ -167,11 +191,13 @@ module ChefGen
       # in the environment.
       # @param srcdir [String] the path to the generator cookbook
       # @return [String] the temporary path to generate from
-      def copy_generator_dir(srcdir, selected)
+      def copy_generator_dir(srcdir)
         dstdir = Dir.mktmpdir('chefgen_flavor.')
-        at_exit {
+        at_exit do
           FileUtils.rm_rf(dstdir)
-        } unless ENV.key?('CHEFGEN_NOCLEANTMP')
+        end unless ENV.key?('CHEFGEN_NOCLEANTMP')
+        $stdout.puts srcdir
+        $stdout.puts dstdir
         FileUtils.cp_r(srcdir, dstdir)
         File.join(dstdir, File.basename(srcdir))
       end

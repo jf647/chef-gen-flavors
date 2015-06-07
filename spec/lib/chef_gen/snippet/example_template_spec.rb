@@ -1,3 +1,4 @@
+require 'chef_gen/flavors'
 require 'chef_gen/flavor_base'
 require 'chef_gen/snippets'
 
@@ -6,12 +7,20 @@ module ChefGen
     class Awesome < FlavorBase
       include ChefGen::Snippet::ExampleTemplate
 
-      class << self
-        # :nocov:
-        def description
-          'my awesome template'
-        end
-        # :nocov:
+      # :nocov:
+      def self.description
+        'my awesome template'
+      end
+      # :nocov:
+
+      def self.code_generator_path(classfile)
+        File.expand_path(
+          File.join(
+            classfile,
+            '..', '..', '..', '..',
+            'support', 'fixtures', 'code_generator'
+          )
+        )
       end
     end
   end
@@ -21,6 +30,7 @@ end
 RSpec.describe ChefGen::Snippet::ExampleTemplate do
   include ChefDKGeneratorContext
   include DummyRecipe
+  include StdQuiet
 
   %w(templates templates/default).each do |dname|
     it "should create the directory #{dname}" do
@@ -36,5 +46,11 @@ RSpec.describe ChefGen::Snippet::ExampleTemplate do
       template = ChefGen::Flavor::Awesome.new(@recipe)
       template.generate
     end
+  end
+
+  it 'should copy snippet contents' do
+    ChefGen::Flavors.disregard_plugin :baz
+    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ChefGen::Flavors.path
   end
 end

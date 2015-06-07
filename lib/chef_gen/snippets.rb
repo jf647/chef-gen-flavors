@@ -10,6 +10,7 @@ module ChefGen
     autoload :ResourceProvider, 'chef_gen/snippet/resource_provider'
     autoload :StandardIgnore, 'chef_gen/snippet/standard_ignore'
     autoload :StyleRubocop, 'chef_gen/snippet/style_rubocop'
+    autoload :StyleFoodcritic, 'chef_gen/snippet/style_foodcritic'
     autoload :TestKitchen, 'chef_gen/snippet/test_kitchen'
     autoload :GitInit, 'chef_gen/snippet/git_init'
   end

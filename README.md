@@ -52,10 +52,10 @@ than one plugin is found, you will be prompted as to which you want to use:
 
     $ chef generate cookbook my_app
 
-If you set the environment variable `CHEFGEN_TEMPLATE` to the name of a
+If you set the environment variable `CHEFGEN_FLAVOR` to the name of a
 plugin, it will be chosen instead of presenting a prompt:
 
-    $ CHEFGEN_TEMPLATE=mytemplate chef generate cookbook my_app
+    $ CHEFGEN_FLAVOR=mytemplate chef generate cookbook my_app
 
 ## USING THE BUILT-IN CHEFDK TEMPLATE
 
@@ -167,13 +167,15 @@ generator cookbook to a temporary path, which is what gets returned
 and used by ChefDK.  This path is cleaned up at exit unless the environment
 variable CHEFGEN_NOCLEANTMP is set.
 
-This temporary path is set as an attribute in the ChefDK Generator
-context, and can be retrieved in a flavor by calling
+## ADDING CONTENT TO THE GENERATOR COPY
 
-    ChefDK::Generator.context.generator_path
+After the generator is copied to a temporary path, the #add_content
+instance method is called (if it exists) on the flavor class.  It is
+passed one arg: the path to the temporary copy.
 
-This is foundational work to allow snippets to include content as well
-as declarations of what files they will render.
+This allows flavors to create content dynamically by writing files
+to the proper directly.  It is exploited by the flavor base class
+described below.
 
 ## FLAVOR BASE CLASS
 
@@ -216,8 +218,6 @@ The plugin has several helper methods you can use:
 * `files_if_missing` is an `Array` of files to create which should not be overwritten if they exist
 * `templates` is an `Array` of templates to render
 * `templates_if_missing` is an `Array` of templates to render which should not be overwritten if they exist
-* `chefignore_files` is an `Array` of glob patterns to write to the `chefignore` file.  If this array is empty, the file is not created automatically (but templates can take this on themselves)
-* `gitignore_files` is an `Array` of glob patterns to write to the `.gitignore` file.  If this array is empty, the file is not created automatically (but templates can take this on themselves)
 * `fail_on_clobber` is a boolean accessor which causes generation to fail if any files in the `files` or `templates` arrays already exist.  Defaults to true, but can be set to false by adding `-a clobber` to the `chef generate` command line
 * `report_actions` is a boolean accessor which causes the generator to report all of the actions it took
 * `next_steps` is a message to be displayed to the user as the last thing the generator does
@@ -256,7 +256,7 @@ is equivalent to manually creating these resources:
     end
 
     template "#{cookbook_dir}/.rubocop.yml" do
-      source '_rubocop_yml.erb'
+      source '\_rubocop\_yml.erb'
     end
 
 ### TEMPLATE SNIPPETS
@@ -311,6 +311,46 @@ like this:
         end
       end
     end
+
+### SNIPPET CONTENT
+
+FlavorBase provides an #add_content method to allow snippets to create
+content.  For example, the `Attributes` snippet is defined like this:
+
+```
+module ChefGen
+  module Snippet
+    module Attributes
+      def snippet_attributes_dirs(recipe)
+        @directories << 'attributes'
+      end
+
+      def snippet_attributes_files(recipe)
+        @templates_if_missing << File.join('attributes', 'default.rb')
+      end
+
+      def content_attribute_files(path)
+        copy_snippet_file(
+          File.join(
+            File.dirname(__FILE__), '..', '..', '..',
+            'shared', 'snippet', 'attributes', 'attributes_default_rb.erb'
+          ),
+          File.join(path, 'templates', 'default', 'attributes_default_rb.erb')
+        )
+      end
+    end
+  end
+end
+```
+
+When a flavor that includes this snippet is selected, the file
+`shared/snippet/attributes/attributes_default_rb.erb` is copied to
+the path `templates/default/attributes_default_rb.erb` in the temporary
+generator path.
+
+Look at the snippets in the `lib/chef_gen/snippet` directory and the
+[example flavor](https://github.com/Nordstrom/chef-gen-flavor-example)
+for an full demonstration of how these hooks work.
 
 ## FEATURE TESTING FLAVORS
 

@@ -40,6 +40,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'creates files unconditionally' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).once
     expect(@recipe).to receive(:cookbook_file).once
     template = ChefGen::Flavor::Amazing.new(@recipe)
@@ -48,6 +50,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'creates files conditionally with the clobber check enabled' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).once
     expect(@recipe).not_to receive(:cookbook_file)
     expect(File).to receive(:exist?)
@@ -62,6 +66,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'creates files conditionally with the clobber check disabled' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).once
     expect(@recipe).to receive(:cookbook_file).once
     expect(@ctx).to receive(:respond_to?).with(:clobber).and_return(true)
@@ -71,6 +77,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'creates templates unconditionally' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).once
     expect(@recipe).to receive(:template).once
     template = ChefGen::Flavor::Amazing.new(@recipe)
@@ -79,6 +87,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'creates templates conditionally with the clobber check enabled' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).once
     expect(@recipe).not_to receive(:template)
     expect(File).to receive(:exist?)
@@ -93,6 +103,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'creates templates conditionally with the clobber check disabled' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).once
     expect(@recipe).to receive(:template).once
     expect(@ctx).to receive(:respond_to?).with(:clobber).and_return(true)
@@ -101,35 +113,9 @@ RSpec.describe ChefGen::FlavorBase do
     template.generate
   end
 
-  it 'accumulates .gitignore entries' do
-    expect(@recipe).to receive(:file).with(/.gitignore$/)
-    template = ChefGen::Flavor::Amazing.new(@recipe)
-    template.gitignore_files << 'foo'
-    template.gitignore_files << 'bar'
-    template.generate
-  end
-
-  it 'does not write a .gitignore if there are no entries' do
-    expect(@recipe).not_to receive(:cookbook_file).with(/.gitignore$/)
-    template = ChefGen::Flavor::Amazing.new(@recipe)
-    template.generate
-  end
-
-  it 'accumulates chefignore entries' do
-    expect(@recipe).to receive(:file).with(/chefignore$/)
-    template = ChefGen::Flavor::Amazing.new(@recipe)
-    template.chefignore_files << 'foo'
-    template.chefignore_files << 'bar'
-    template.generate
-  end
-
-  it 'does not write a chefignore if there are no entries' do
-    expect(@recipe).not_to receive(:cookbook_file).with(/chefignore$/)
-    template = ChefGen::Flavor::Amazing.new(@recipe)
-    template.generate
-  end
-
   it 'calls mixin methods' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:directory).with(/foo$/)
     expect(@recipe).to receive(:directory).with(%r{foo/bar$})
     template = ChefGen::Flavor::Amazing.new(@recipe)
@@ -138,6 +124,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'reports on actions by default' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:ruby_block).with('report_actions_taken')
     template = ChefGen::Flavor::Amazing.new(@recipe)
     template.files << 'README.md'
@@ -145,6 +133,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'does not report actions if disabled' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).not_to receive(:ruby_block)
     template = ChefGen::Flavor::Amazing.new(@recipe)
     template.report_actions = false
@@ -153,6 +143,8 @@ RSpec.describe ChefGen::FlavorBase do
   end
 
   it 'displays the next steps if populated' do
+    include FakeFS::SpecHelpers
+
     expect(@recipe).to receive(:ruby_block).with('display_next_steps')
     template = ChefGen::Flavor::Amazing.new(@recipe)
     template.report_actions = false
