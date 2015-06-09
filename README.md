@@ -280,10 +280,16 @@ number of snippets, which can be included in your plugin class like so:
       end
     end
 
+Snippets can add both declarations (files and templates to be rendered)
+and content.  This reduces the amount of content that a flavor author
+has to include in their distribution.
+
 The snippets that ship with this gem are:
 
 * `CookbookBase` - sets up the basic files any cookbook needs (README, CHANGELOG, etc.)
+* `StyleFoodcritic` - sets up the files for style checking with Foodcritic
 * `StyleRubocop` - sets up the files for style checking with Rubocop
+* `StyleTailor` - sets up the files for style checking with Tailor
 * `ChefSpec` - sets up the files for basic ChefSpec unit testing
 * `TestKitchen` - sets up the files for basic Test Kitchen integration testing
 * `Recipes` - creates recipes/default.rb
@@ -311,6 +317,38 @@ like this:
         end
       end
     end
+
+### SNIPPET INITIALIZERS
+
+Because you cannot add on to #initialize in a class when including a
+module, the FlavorBase initializer will call any public method provided
+by a snippet prefixed by `init\_`.  For example, the StandardIgnore
+snippet initializes its list of patterns:
+
+```
+# initializes the pattern arrays
+def init_standardignore_instancevars
+  @chefignore_patterns = %w(
+    .DS_Store Icon? nohup.out ehthumbs.db Thumbs.db
+    .sasscache \#* .#* *~ *.sw[az] *.bak REVISION TAGS*
+    tmtags *_flymake.* *_flymake *.tmproj .project .settings
+    mkmf.log a.out *.o *.pyc *.so *.com *.class *.dll
+    *.exe */rdoc/ .watchr  test/* features/* Procfile
+    .git */.git .gitignore .gitmodules .gitconfig .gitattributes
+    .svn */.bzr/* */.hg/*
+  )
+  @gitignore_patterns = %w(
+    Berksfile.lock *~ *# .#* \#*# .*.sw[az] *.un~
+    bin/* .bundle/*
+  )
+end
+```
+
+### AFTER SNIPPETS HOOK
+
+After all snippets have run, the method #after_run_snippets will be run
+if defined.  This is useful to unwind or remove things in a derived
+flavor.
 
 ### SNIPPET CONTENT
 
@@ -352,16 +390,43 @@ Look at the snippets in the `lib/chef_gen/snippet` directory and the
 [example flavor](https://github.com/Nordstrom/chef-gen-flavor-example)
 for an full demonstration of how these hooks work.
 
+### SNIPPET DOCUMENTATION
+
+Some of the snippets provide extra functionality worth calling out:
+
+#### CookbookBase
+
+Provides several reader methods:
+
+* `cookbook_gems`, a hash of gem names to gem constraints.  Flavors and other snippets can add to this list; all the gems are rendered to a Gemfile by this snippet
+* `gem_sources`, an array of gem source URL.  This defaults to 'https://rubygems.org' and can be replaced or added onto
+* `berks_sources`, an array of Berksfile source URLs.  This defaults to 'https://supermarket.chef.io' and can be replaced or added onto
+* `rake_tasks`, a hash of task names to task content.  This allows snippets to add extra tasks to the Rakefile, which is rendered by this snippet
+* `guard_sets`, a hash of guard set names to set content.  This allows snippets to add extra tasks to the Guardfile, which is rendered by this snippet
+
+Look at the content of these snippets for a better understanding of how
+to use these methods.  For example, the ChefSpec snippet adds gems, rake
+tasks and guard sets.
+
+#### StandardIgnore
+
+Provides several reader methods:
+
+* `chefignore_patterns`, an array of patterns to write to the chefignore file
+* `gitignore_patterns`, an array of patterns to write to the .gitignore file
+
 ## FEATURE TESTING FLAVORS
 
-chef-gen-flavors provides a number of useful step definitions for Aruba (a CLI
-driver for Cucumber) to make it easier to test flavors.  To access these definitions,
-add the following line to your `features/support/env.rb` file:
+chef-gen-flavors provides a number of useful step definitions for Aruba
+(a CLI driver for Cucumber) to make it easier to test flavors.  To
+access these definitions, add the following line to your
+`features/support/env.rb` file:
 
     require 'chef_gen/flavors/cucumber'
 
-For an example of how to use these steps in your features, refer to the reference
-implementation of a flavor: [chef-gen-flavor-example](https://github.com/Nordstrom/chef-gen-flavor-example).
+For an example of how to use these steps in your features, refer to the
+reference implementation of a flavor:
+[chef-gen-flavor-example](https://github.com/Nordstrom/chef-gen-flavor-example).
 
 Documentation for the steps themselves is in the file `ARUBA_STEPS.md`
 

@@ -1,5 +1,21 @@
 # Changelog for chef-gen-flavors
 
+## 0.7.0
+
+Major re-organization around snippets
+
+* the code generator cookbook is now copied to a temporary directory that snippets can augment
+* snippets can therefore write content as well as file declarations.  All of the core snippets have been enhanced to do this, so the example cookbook is now tiny.
+* add hooks for snippets to initialize themselves
+* add a hook after all snippets have run in case mods want to rewind or undo things that other snippets have done
+* add the version of the flavor to the description in the menu
+* enhance the cookbook base snippet to allow the Rakefile to be composed of content from other snippets
+* enhance the cookbook base snippet to allow the Gemfile to be composed of content from other snippets
+* enhance the cookbook base snippet to allow the Guardfile to be composed of content from other snippets
+* move the chefignore/gitignore accumulators out of FlavorBase and into the StandardIgnore snippet
+* extract FoodCritic to its own snippet
+* add a StyleTailor snippet
+
 ## 0.6.2
 
 * sort flavors alphabetically (suggested by @echohack)
