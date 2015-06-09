@@ -3,7 +3,7 @@
 * home :: https://github.com/Nordstrom/chef-gen-flavors
 * license :: [Apache2](http://www.apache.org/licenses/LICENSE-2.0)
 * gem version :: [![Gem Version](https://badge.fury.io/rb/chef-gen-flavors.png)](http://badge.fury.io/rb/chef-gen-flavors)
-* build status :: [![Build Status](https://travis-ci.org/Nordstrom/chef-gen-flavors.png?branch=master)](https://travis-ci.org/Nordstrom/chef-gen-flavors)
+* build status :: [![Circle CI](https://circleci.com/gh/Nordstrom/chef-gen-flavors.svg?style=svg)](https://circleci.com/gh/Nordstrom/chef-gen-flavors)
 * code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-gen-flavors/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-gen-flavors)
 * docs :: [![Inline docs](http://inch-ci.org/github/nordstrom/chef-gen-flavors.svg?branch=master)](http://inch-ci.org/github/nordstrom/chef-gen-flavors)
 
@@ -52,10 +52,10 @@ than one plugin is found, you will be prompted as to which you want to use:
 
     $ chef generate cookbook my_app
 
-If you set the environment variable `CHEFGEN_TEMPLATE` to the name of a
+If you set the environment variable `CHEFGEN_FLAVOR` to the name of a
 plugin, it will be chosen instead of presenting a prompt:
 
-    $ CHEFGEN_TEMPLATE=mytemplate chef generate cookbook my_app
+    $ CHEFGEN_FLAVOR=mytemplate chef generate cookbook my_app
 
 ## USING THE BUILT-IN CHEFDK TEMPLATE
 
@@ -167,13 +167,15 @@ generator cookbook to a temporary path, which is what gets returned
 and used by ChefDK.  This path is cleaned up at exit unless the environment
 variable CHEFGEN_NOCLEANTMP is set.
 
-This temporary path is set as an attribute in the ChefDK Generator
-context, and can be retrieved in a flavor by calling
+## ADDING CONTENT TO THE GENERATOR COPY
 
-    ChefDK::Generator.context.generator_path
+After the generator is copied to a temporary path, the #add_content
+instance method is called (if it exists) on the flavor class.  It is
+passed one arg: the path to the temporary copy.
 
-This is foundational work to allow snippets to include content as well
-as declarations of what files they will render.
+This allows flavors to create content dynamically by writing files
+to the proper directly.  It is exploited by the flavor base class
+described below.
 
 ## FLAVOR BASE CLASS
 
@@ -216,8 +218,6 @@ The plugin has several helper methods you can use:
 * `files_if_missing` is an `Array` of files to create which should not be overwritten if they exist
 * `templates` is an `Array` of templates to render
 * `templates_if_missing` is an `Array` of templates to render which should not be overwritten if they exist
-* `chefignore_files` is an `Array` of glob patterns to write to the `chefignore` file.  If this array is empty, the file is not created automatically (but templates can take this on themselves)
-* `gitignore_files` is an `Array` of glob patterns to write to the `.gitignore` file.  If this array is empty, the file is not created automatically (but templates can take this on themselves)
 * `fail_on_clobber` is a boolean accessor which causes generation to fail if any files in the `files` or `templates` arrays already exist.  Defaults to true, but can be set to false by adding `-a clobber` to the `chef generate` command line
 * `report_actions` is a boolean accessor which causes the generator to report all of the actions it took
 * `next_steps` is a message to be displayed to the user as the last thing the generator does
@@ -256,7 +256,7 @@ is equivalent to manually creating these resources:
     end
 
     template "#{cookbook_dir}/.rubocop.yml" do
-      source '_rubocop_yml.erb'
+      source '\_rubocop\_yml.erb'
     end
 
 ### TEMPLATE SNIPPETS
@@ -280,10 +280,16 @@ number of snippets, which can be included in your plugin class like so:
       end
     end
 
+Snippets can add both declarations (files and templates to be rendered)
+and content.  This reduces the amount of content that a flavor author
+has to include in their distribution.
+
 The snippets that ship with this gem are:
 
 * `CookbookBase` - sets up the basic files any cookbook needs (README, CHANGELOG, etc.)
+* `StyleFoodcritic` - sets up the files for style checking with Foodcritic
 * `StyleRubocop` - sets up the files for style checking with Rubocop
+* `StyleTailor` - sets up the files for style checking with Tailor
 * `ChefSpec` - sets up the files for basic ChefSpec unit testing
 * `TestKitchen` - sets up the files for basic Test Kitchen integration testing
 * `Recipes` - creates recipes/default.rb
@@ -312,16 +318,115 @@ like this:
       end
     end
 
+### SNIPPET INITIALIZERS
+
+Because you cannot add on to #initialize in a class when including a
+module, the FlavorBase initializer will call any public method provided
+by a snippet prefixed by `init\_`.  For example, the StandardIgnore
+snippet initializes its list of patterns:
+
+```
+# initializes the pattern arrays
+def init_standardignore_instancevars
+  @chefignore_patterns = %w(
+    .DS_Store Icon? nohup.out ehthumbs.db Thumbs.db
+    .sasscache \#* .#* *~ *.sw[az] *.bak REVISION TAGS*
+    tmtags *_flymake.* *_flymake *.tmproj .project .settings
+    mkmf.log a.out *.o *.pyc *.so *.com *.class *.dll
+    *.exe */rdoc/ .watchr  test/* features/* Procfile
+    .git */.git .gitignore .gitmodules .gitconfig .gitattributes
+    .svn */.bzr/* */.hg/*
+  )
+  @gitignore_patterns = %w(
+    Berksfile.lock *~ *# .#* \#*# .*.sw[az] *.un~
+    bin/* .bundle/*
+  )
+end
+```
+
+### AFTER SNIPPETS HOOK
+
+After all snippets have run, the method #after_run_snippets will be run
+if defined.  This is useful to unwind or remove things in a derived
+flavor.
+
+### SNIPPET CONTENT
+
+FlavorBase provides an #add_content method to allow snippets to create
+content.  For example, the `Attributes` snippet is defined like this:
+
+```
+module ChefGen
+  module Snippet
+    module Attributes
+      def snippet_attributes_dirs(recipe)
+        @directories << 'attributes'
+      end
+
+      def snippet_attributes_files(recipe)
+        @templates_if_missing << File.join('attributes', 'default.rb')
+      end
+
+      def content_attribute_files(path)
+        copy_snippet_file(
+          File.join(
+            File.dirname(__FILE__), '..', '..', '..',
+            'shared', 'snippet', 'attributes', 'attributes_default_rb.erb'
+          ),
+          File.join(path, 'templates', 'default', 'attributes_default_rb.erb')
+        )
+      end
+    end
+  end
+end
+```
+
+When a flavor that includes this snippet is selected, the file
+`shared/snippet/attributes/attributes_default_rb.erb` is copied to
+the path `templates/default/attributes_default_rb.erb` in the temporary
+generator path.
+
+Look at the snippets in the `lib/chef_gen/snippet` directory and the
+[example flavor](https://github.com/Nordstrom/chef-gen-flavor-example)
+for an full demonstration of how these hooks work.
+
+### SNIPPET DOCUMENTATION
+
+Some of the snippets provide extra functionality worth calling out:
+
+#### CookbookBase
+
+Provides several reader methods:
+
+* `cookbook_gems`, a hash of gem names to gem constraints.  Flavors and other snippets can add to this list; all the gems are rendered to a Gemfile by this snippet
+* `gem_sources`, an array of gem source URL.  This defaults to 'https://rubygems.org' and can be replaced or added onto
+* `berks_sources`, an array of Berksfile source URLs.  This defaults to 'https://supermarket.chef.io' and can be replaced or added onto
+* `rake_tasks`, a hash of task names to task content.  This allows snippets to add extra tasks to the Rakefile, which is rendered by this snippet
+* `guard_sets`, a hash of guard set names to set content.  This allows snippets to add extra tasks to the Guardfile, which is rendered by this snippet
+
+Look at the content of these snippets for a better understanding of how
+to use these methods.  For example, the ChefSpec snippet adds gems, rake
+tasks and guard sets.
+
+#### StandardIgnore
+
+Provides several reader methods:
+
+* `chefignore_patterns`, an array of patterns to write to the chefignore file
+* `gitignore_patterns`, an array of patterns to write to the .gitignore file
+
 ## FEATURE TESTING FLAVORS
 
-chef-gen-flavors provides a number of useful step definitions for Aruba (a CLI
-driver for Cucumber) to make it easier to test flavors.  To access these definitions,
-add the following line to your `features/support/env.rb` file:
+chef-gen-flavors provides a number of useful step definitions for Aruba
+(a CLI driver for Cucumber) to make it easier to test flavors.  To
+access these definitions, add the following line to your
+`features/support/env.rb` file:
 
     require 'chef_gen/flavors/cucumber'
 
-For an example of how to use these steps in your features, refer to the reference
-implementation of a flavor: [chef-gen-flavor-example](https://github.com/Nordstrom/chef-gen-flavor-example).
+For an example of how to use these steps in your features, refer to the
+reference implementation of a flavor:
+[chef-gen-flavor-example](https://github.com/Nordstrom/chef-gen-flavor-example).
 
 Documentation for the steps themselves is in the file `ARUBA_STEPS.md`
 

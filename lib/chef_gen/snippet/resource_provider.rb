@@ -19,6 +19,24 @@ module ChefGen
         @templates_if_missing << File.join('resources', 'default.rb')
         @templates_if_missing << File.join('providers', 'default.rb')
       end
+
+      # copies snippet content
+      # @param path [String] the path to the temporary generator cookbook
+      # @return [void]
+      def content_resourceprovider_files(path)
+        %w(
+          resources_default_rb.erb
+          providers_default_rb.erb
+        ).each do |file|
+          copy_snippet_file(
+            File.join(
+              File.dirname(__FILE__), '..', '..', '..',
+              'shared', 'snippet', 'resourceprovider', file
+            ),
+            File.join(path, 'templates', 'default', file)
+          )
+        end
+      end
     end
   end
 end

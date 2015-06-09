@@ -1,0 +1,20 @@
+desc 'runs style tests'
+task style: []
+
+desc 'runs unit tests'
+task spec: []
+
+desc 'runs integration tests'
+task integration: []
+
+desc 'runs style and unit tests'
+task test: [:style, :spec]
+
+desc 'runs all tests'
+task default: :test
+
+<% @tasks.each do |name, task| -%>
+# <%= name %>
+<%= task %>
+
+<% end -%>

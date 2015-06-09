@@ -1,3 +1,4 @@
+require 'fakefs/spec_helpers'
 require 'rspec/core/shared_context'
 
 if ENV['COVERAGE']
@@ -49,6 +50,7 @@ module ChefDKGeneratorContext
     allow(@ctx).to receive(:cookbook_name).and_return('foo')
     allow(@ctx).to receive(:have_git).and_return(true)
     allow(@ctx).to receive(:skip_git_init).and_return(false)
+    allow(@ctx).to receive(:generator_path).and_return('/nonexistent')
     allow(@ctx).to receive(:generator_path=)
     allow(ChefDK::Generator).to receive(:context).and_return(@ctx)
   end
@@ -60,5 +62,19 @@ module DummyRecipe
 
   before do
     @recipe = double('Chef recipe').as_null_object
+  end
+end
+
+# a shared context that redirects stdout/stderr to null
+module StdQuiet
+  extend RSpec::Core::SharedContext
+
+  before do
+    @orig_stdout = $stdout
+    $stdout = File.open(File::NULL, 'w')
+  end
+
+  after do
+    $stdout = @orig_stdout
   end
 end

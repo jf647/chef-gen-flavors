@@ -1,0 +1,20 @@
+#
+# Resource: <%= cookbook_name %>
+# Copyright (c) <%= year %> <%= copyright_holder %>
+#
+
+use_inline_resources
+
+def whyrun_supported?
+  true
+end
+
+action :create do
+  converge_by 'create a <%= cookbook_name %>' do
+  end
+end
+
+action :delete do
+  converge_by 'delete a <%= cookbook_name %>' do
+  end
+end

@@ -1,0 +1,10 @@
+notification :terminal_title
+
+# prevent dropping into pry when nothing is happening
+interactor :off
+
+<% @guards.each do |name, guard| -%>
+# <%= name %>
+<%= guard %>
+
+<% end -%>

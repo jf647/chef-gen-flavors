@@ -1,3 +1,4 @@
+require 'chef_gen/flavors'
 require 'chef_gen/flavor_base'
 require 'chef_gen/snippets'
 
@@ -6,12 +7,20 @@ module ChefGen
     class Awesome < FlavorBase
       include ChefGen::Snippet::TestKitchen
 
-      class << self
-        # :nocov:
-        def description
-          'my awesome template'
-        end
-        # :nocov:
+      # :nocov:
+      def self.description
+        'my awesome template'
+      end
+      # :nocov:
+
+      def self.code_generator_path(classfile)
+        File.expand_path(
+          File.join(
+            classfile,
+            '..', '..', '..', '..',
+            'support', 'fixtures', 'code_generator'
+          )
+        )
       end
     end
   end
@@ -21,6 +30,7 @@ end
 RSpec.describe ChefGen::Snippet::TestKitchen do
   include ChefDKGeneratorContext
   include DummyRecipe
+  include StdQuiet
 
   %w(test test/integration test/integration/default
      test/integration/default/serverspec
@@ -40,5 +50,24 @@ RSpec.describe ChefGen::Snippet::TestKitchen do
       template = ChefGen::Flavor::Awesome.new(@recipe)
       template.generate
     end
+  end
+
+  it 'should add the testkitchen gems' do
+    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template.generate
+    expect(template.cookbook_gems.keys).to include('test-kitchen')
+    expect(template.cookbook_gems.keys).to include('kitchen-vagrant')
+  end
+
+  it 'should add the testkitchen rake tasks' do
+    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template.generate
+    expect(template.rake_tasks.keys).to include('testkitchen')
+  end
+
+  it 'should copy snippet contents' do
+    ChefGen::Flavors.disregard_plugin :baz
+    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ChefGen::Flavors.path
   end
 end
