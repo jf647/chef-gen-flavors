@@ -1,5 +1,9 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.2
+
+* TestKitchen snippet: require the TK rake tasks inside the rescue block so that if we blow up because vagrant isn't installed, we can recover
+
 ## 0.8.1
 
 * CookbookBase snippet: disable the line length cop in Gemfile via .rubocop.yml instead of via an inline comment
