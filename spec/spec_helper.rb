@@ -1,5 +1,6 @@
 require 'fakefs/spec_helpers'
 require 'rspec/core/shared_context'
+require 'chef-dk/generator'
 
 if ENV['COVERAGE']
   require 'simplecov'
@@ -76,5 +77,16 @@ module StdQuiet
 
   after do
     $stdout = @orig_stdout
+  end
+end
+
+# a shared context that resets the flavor plugins
+module ResetPlugins
+  extend RSpec::Core::SharedContext
+
+  before do
+    ChefGen::Flavors.clear_plugins
+    ENV.delete('CHEFGEN_FLAVOR')
+    ENV.delete('CHEFDK_FLAVOR')
   end
 end

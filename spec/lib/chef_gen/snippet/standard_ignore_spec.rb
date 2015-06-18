@@ -4,7 +4,7 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class StandardIgnore < FlavorBase
       include ChefGen::Snippet::StandardIgnore
 
       # :nocov:
@@ -30,22 +30,23 @@ RSpec.describe ChefGen::Snippet::StandardIgnore do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
   it 'should create a chefignore file' do
     expect(@recipe).to receive(:file).with(/chefignore$/)
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StandardIgnore.new(@recipe)
     template.generate
   end
 
   it 'should create a .gitignore file' do
     expect(@recipe).to receive(:file).with(/.gitignore$/)
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StandardIgnore.new(@recipe)
     template.generate
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'standard_ignore'
     ChefGen::Flavors.path
   end
 end

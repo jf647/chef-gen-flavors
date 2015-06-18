@@ -7,18 +7,8 @@ require 'support/fixtures/lib/chef_gen/flavor/baz'
 
 RSpec.describe ChefGen::Flavors do
   include ChefDKGeneratorContext
-
-  before do
-    ChefGen::Flavors.clear_plugins
-    ENV.delete('CHEFGEN_FLAVOR')
-    ENV.delete('CHEFDK_FLAVOR')
-    @orig_stdout = $stdout
-    $stdout = File.open(File::NULL, 'w')
-  end
-
-  after do
-    $stdout = @orig_stdout
-  end
+  include StdQuiet
+  include ResetPlugins
 
   it 'should be able to load plugins' do
     expect(ChefGen::Flavors.plugins).to be_a(Hash)
@@ -27,7 +17,7 @@ RSpec.describe ChefGen::Flavors do
   it 'should load the expected plugins' do
     ChefGen::Flavors.disregard_plugin :amazing, :awesome
     expect(ChefGen::Flavors.plugins.keys).to(
-      contain_exactly(:foo, :bar, :baz)
+      include(:foo, :bar, :baz)
     )
   end
 
@@ -82,15 +72,21 @@ RSpec.describe ChefGen::Flavors do
   end
 
   it 'should raise an error if there are no plugins available' do
-    ChefGen::Flavors.disregard_plugin :foo, :bar, :baz,
-                                      :amazing, :awesome
+    to_disregard = ChefGen::Flavors.plugins.keys
+    ChefGen::Flavors.clear_plugins
+    to_disregard.each do |plugin|
+      ChefGen::Flavors.disregard_plugin plugin
+    end
     expect { ChefGen::Flavors.path }.to raise_error
   end
 
-  it 'should offer the builtin flavors as an option with the env var set' do
+  it 'should use the builtin flavor as an option with the env var set' do
     ENV['CHEFDK_FLAVOR'] = 'true'
-    ChefGen::Flavors.disregard_plugin :foo, :bar, :baz,
-                                      :amazing, :awesome
+    to_disregard = ChefGen::Flavors.plugins.keys
+    ChefGen::Flavors.clear_plugins
+    to_disregard.each do |plugin|
+      ChefGen::Flavors.disregard_plugin plugin
+    end
     expect(ChefGen::Flavors).not_to receive(:prompt_for_plugin)
     ChefGen::Flavors.path
   end

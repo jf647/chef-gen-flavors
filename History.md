@@ -1,5 +1,11 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.0
+
+* give snippets the ability to use the add_render to construct resources with additional attributes
+* add local override inclusion for Gemfile, Berksfile and Guardfile to snippets
+* allow the CookbookBase snippet's @cookbook_gems hash to take an String or Array value.  A string is a constraint, an Array is a constraint plus 0..n extra args (like a git source)
+
 ## 0.7.0
 
 Major re-organization around snippets

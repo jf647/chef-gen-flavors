@@ -24,6 +24,7 @@ end
 RSpec.describe ChefGen::FlavorBase do
   include ChefDKGeneratorContext
   include DummyRecipe
+  include ResetPlugins
 
   before do
     @orig_stdout = $stdout
