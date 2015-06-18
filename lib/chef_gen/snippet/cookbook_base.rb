@@ -1,5 +1,7 @@
 # rubocop:disable Metrics/MethodLength
 
+require 'chef/mixin/params_validate'
+
 module ChefGen
   module Snippet
     # creates the basic files that every cookbook should have
@@ -28,13 +30,13 @@ module ChefGen
         @rake_tasks = {}
         @guard_sets = {}
         @cookbook_gems = {
-          rake: '~> 10.4',
-          pry: '~> 0.10',
+          'rake' => '~> 10.4',
+          'pry' => '~> 0.10',
           'pry-byebug' => '~> 3.1',
           'pry-rescue' => '~> 1.4',
           'pry-stack_explorer' => '~> 0.4',
-          berkshelf: '~> 3.2',
-          guard: '~> 2.12'
+          'berkshelf' => '~> 3.2',
+          'guard' => '~> 2.12'
         }
       end
 
@@ -55,11 +57,15 @@ module ChefGen
       def snippet_cookbookbase_gemfile(recipe)
         gems = @cookbook_gems
         sources = @gem_sources
-        # :nocov:
-        recipe.send(:template, File.join(@target_path, 'Gemfile')) do
-          helpers(ChefDK::Generator::TemplateHelper)
-          variables lazy { { gems: gems, sources: sources } }
+        lazy_vars = Chef::DelayedEvaluator.new do
+          { gems: gems, sources: sources }
         end
+        # :nocov:
+        add_render(
+          %w(Gemfile),
+          resource_action: :create,
+          attrs: { variables: lazy_vars }
+        )
         # :nocov:
       end
 
@@ -69,11 +75,15 @@ module ChefGen
       # @return [void]
       def snippet_cookbookbase_berksfile(recipe)
         sources = @berks_sources
-        # :nocov:
-        recipe.send(:template, File.join(@target_path, 'Berksfile')) do
-          helpers(ChefDK::Generator::TemplateHelper)
-          variables lazy { { sources: sources } }
+        lazy_vars = Chef::DelayedEvaluator.new do
+          { sources: sources }
         end
+        # :nocov:
+        add_render(
+          %w(Berksfile),
+          resource_action: :create,
+          attrs: { variables: lazy_vars }
+        )
         # :nocov:
       end
 
@@ -83,11 +93,15 @@ module ChefGen
       # @return [void]
       def snippet_cookbookbase_rakefile(recipe)
         tasks = @rake_tasks
-        # :nocov:
-        recipe.send(:template, File.join(@target_path, 'Rakefile')) do
-          helpers(ChefDK::Generator::TemplateHelper)
-          variables lazy { { tasks: tasks } }
+        lazy_vars = Chef::DelayedEvaluator.new do
+          { tasks: tasks }
         end
+        # :nocov:
+        add_render(
+          %w(Rakefile),
+          resource_action: :create,
+          attrs: { variables: lazy_vars }
+        )
         # :nocov:
       end
 
@@ -97,11 +111,15 @@ module ChefGen
       # @return [void]
       def snippet_cookbookbase_guardfile(recipe)
         guards = @guard_sets
-        # :nocov:
-        recipe.send(:template, File.join(@target_path, 'Guardfile')) do
-          helpers(ChefDK::Generator::TemplateHelper)
-          variables lazy { { guards: guards } }
+        lazy_vars = Chef::DelayedEvaluator.new do
+          { guards: guards }
         end
+        # :nocov:
+        add_render(
+          %w(Guardfile),
+          resource_action: :create,
+          attrs: { variables: lazy_vars }
+        )
         # :nocov:
       end
 
@@ -112,10 +130,7 @@ module ChefGen
       def snippet_cookbookbase_ignore(recipe)
         return unless respond_to?(:chefignore_patterns)
         %w(
-          Gemfile
-          Rakefile
-          Guardfile
-          Berksfile
+          Gemfile Rakefile Guardfile Berksfile
         ).each do |e|
           chefignore_patterns << e
         end
@@ -126,13 +141,8 @@ module ChefGen
       # @return [void]
       def content_cookbookbase_files(path)
         %w(
-          Gemfile.erb
-          Berksfile.erb
-          Rakefile.erb
-          Guardfile.erb
-          metadata_rb.erb
-          README_md.erb
-          CHANGELOG_md.erb
+          Gemfile.erb Berksfile.erb Rakefile.erb Guardfile.erb
+          metadata_rb.erb README_md.erb CHANGELOG_md.erb
         ).each do |file|
           # :nocov:
           copy_snippet_file(

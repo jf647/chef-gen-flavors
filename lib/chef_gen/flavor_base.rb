@@ -226,8 +226,10 @@ module ChefGen
         source src
         action action
         helpers(ChefDK::Generator::TemplateHelper) \
-          if :template == resource
-        attrs.each { |m, p| send m, p }
+          if :template == type
+        attrs.each do |attr, value|
+          send attr, value
+        end
         # :nocov:
       end
       @actions_taken << "add resource #{type}[#{dst}]"
