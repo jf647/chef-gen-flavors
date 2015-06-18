@@ -66,11 +66,12 @@ module ChefGen
       def snippet_testkitchen_raketasks(recipe)
         return unless respond_to?(:rake_tasks)
         rake_tasks['testkitchen'] = <<'END'
-require 'kitchen/rake_tasks'
 begin
+  require 'kitchen/rake_tasks'
   Kitchen::RakeTasks.new
-rescue LoadError
+rescue
   puts 'test-kitchen initialization failed; disabling kitchen tasks'
+  task 'kitchen:all'
 end
 task integration: 'kitchen:all'
 END
