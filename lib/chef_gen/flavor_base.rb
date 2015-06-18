@@ -171,11 +171,13 @@ module ChefGen
     # @return [void]
     # @api private
     def add_files
-      _add_files(
-        @files, nil, @fail_on_clobber, :cookbook_file, :create
+      add_render(
+        @files,
+        suffix: '', resource: :cookbook_file, resource_action: :create
       )
-      _add_files(
-        @files_if_missing, nil, false, :cookbook_file, :create_if_missing
+      add_render(
+        @files_if_missing,
+        suffix: '', clobberfail: false, resource: :cookbook_file
       )
     end
 
@@ -184,41 +186,51 @@ module ChefGen
     # @return [void]
     # @api private
     def add_templates
-      _add_files(
-        @templates, '.erb', @fail_on_clobber, :template, :create
-      )
-      _add_files(
-        @templates_if_missing, '.erb', false, :template, :create_if_missing
-      )
+      add_render(@templates, resource_action: :create)
+      add_render(@templates_if_missing, clobberfail: false)
     end
 
     # does the heavy lifting for add_files and add_templates
-    # @param files [Array] the list of things to declare
+    # @param things [Array] the list of things to declare
     # @param suffix [String] a suffix to add to the source file
     # @param clobberfail [Boolean] whether to protect against
     #   overwriting files
     # @param resource [Symbol] the symbolized Chef resource to declare
     # @param resource_action [Symbol] the action to give the resource
+    # @param attrs [Hash] additional attributes to send to the resource.
+    #   Keys are methods, values are parameters
     # @return [void]
     # @api private
-    def _add_files(files, suffix, clobberfail, resource, resource_action)
-      files.flatten.each do |filename|
+    def add_render( # rubocop:disable Metrics/ParameterLists
+      things,
+      suffix: '.erb', clobberfail: @fail_on_clobber,
+      resource: :template, resource_action: :create_if_missing,
+      attrs: {}
+    )
+      things.flatten.each do |filename|
         src = "#{source_path(filename)}#{suffix}"
         dst = File.join(@target_path, filename)
         if clobberfail && File.exist?(dst)
           @failures << "tried to overwrite file #{dst}"
         else
-          @recipe.send(resource, dst) do
-            # :nocov:
-            source src
-            action resource_action
-            helpers(ChefDK::Generator::TemplateHelper) \
-              if :template == resource
-            # :nocov:
-          end
-          @actions_taken << "create file #{dst}"
+          _add_resource(resource, src, dst, resource_action, attrs)
         end
       end
+    end
+
+    # adds a resource to the recipe
+    # @api private
+    def _add_resource(type, src, dst, action, attrs)
+      @recipe.send(type, dst) do
+        # :nocov:
+        source src
+        action action
+        helpers(ChefDK::Generator::TemplateHelper) \
+          if :template == resource
+        attrs.each { |m, p| send m, p }
+        # :nocov:
+      end
+      @actions_taken << "add resource #{type}[#{dst}]"
     end
 
     # reports on the actions taken by the plugin

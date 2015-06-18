@@ -1,5 +1,9 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.0
+
+* give snippets the ability to use the add_render to construct resources with additional attributes
+
 ## 0.7.0
 
 Major re-organization around snippets
