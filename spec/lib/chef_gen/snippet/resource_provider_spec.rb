@@ -4,7 +4,7 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class ResourceProvider < FlavorBase
       include ChefGen::Snippet::ResourceProvider
 
       # :nocov:
@@ -31,11 +31,12 @@ RSpec.describe ChefGen::Snippet::ResourceProvider do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
   %w(resources providers).each do |dname|
     it "should create the directory #{dname}" do
       expect(@recipe).to receive(:directory).with(%r{#{dname}$})
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::ResourceProvider.new(@recipe)
       template.generate
     end
   end
@@ -43,14 +44,14 @@ RSpec.describe ChefGen::Snippet::ResourceProvider do
   %w(resources/default.rb providers/default.rb).each do |fname|
     it "should add a template for #{fname}" do
       expect(@recipe).to receive(:template).with(%r{#{fname}$})
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::ResourceProvider.new(@recipe)
       template.generate
     end
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'resource_provider'
     ChefGen::Flavors.path
   end
 end

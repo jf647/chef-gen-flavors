@@ -4,7 +4,8 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class StyleRubocop < FlavorBase
+      include ChefGen::Snippet::CookbookBase
       include ChefGen::Snippet::StyleRubocop
 
       # :nocov:
@@ -30,37 +31,41 @@ RSpec.describe ChefGen::Snippet::StyleRubocop do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
-  %w(.rubocop.yml).each do |fname|
-    it "should add a template for #{fname}" do
+  it 'should add a .rubocop.yml file' do
+    %w(
+      Gemfile Berksfile Rakefile Guardfile metadata.rb
+      README.md CHANGELOG.md .rubocop.yml
+    ).each do |fname|
       expect(@recipe).to receive(:template).with(/#{fname}$/)
-      template = ChefGen::Flavor::Awesome.new(@recipe)
-      template.generate
     end
+    template = ChefGen::Flavor::StyleRubocop.new(@recipe)
+    template.generate
   end
 
   it 'should add the rubocop gems' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StyleRubocop.new(@recipe)
     template.generate
     expect(template.cookbook_gems.keys).to include('rubocop')
     expect(template.cookbook_gems.keys).to include('guard-rubocop')
   end
 
   it 'should add the rubocop rake tasks' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StyleRubocop.new(@recipe)
     template.generate
     expect(template.rake_tasks.keys).to include('rubocop')
   end
 
   it 'should add the rubocop guard sets' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StyleRubocop.new(@recipe)
     template.generate
     expect(template.guard_sets.keys).to include('rubocop')
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'style_rubocop'
     ChefGen::Flavors.path
   end
 end

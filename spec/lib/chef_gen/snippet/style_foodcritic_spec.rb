@@ -4,7 +4,8 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class StyleFoodcritic < FlavorBase
+      include ChefGen::Snippet::CookbookBase
       include ChefGen::Snippet::StyleFoodcritic
 
       # :nocov:
@@ -30,37 +31,30 @@ RSpec.describe ChefGen::Snippet::StyleFoodcritic do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
-
-  %w(.rubocop.yml).each do |fname|
-    it "should add a template for #{fname}" do
-      expect(@recipe).to receive(:template).with(/#{fname}$/)
-      template = ChefGen::Flavor::Awesome.new(@recipe)
-      template.generate
-    end
-  end
+  include ResetPlugins
 
   it 'should add the foodcritic gems' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StyleFoodcritic.new(@recipe)
     template.generate
     expect(template.cookbook_gems.keys).to include('foodcritic')
     expect(template.cookbook_gems.keys).to include('guard-foodcritic')
   end
 
   it 'should add the foodcritic rake tasks' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StyleFoodcritic.new(@recipe)
     template.generate
     expect(template.rake_tasks.keys).to include('foodcritic')
   end
 
   it 'should add the foodcritic guard sets' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::StyleFoodcritic.new(@recipe)
     template.generate
     expect(template.guard_sets.keys).to include('foodcritic')
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'style_foodcritic'
     ChefGen::Flavors.path
   end
 end

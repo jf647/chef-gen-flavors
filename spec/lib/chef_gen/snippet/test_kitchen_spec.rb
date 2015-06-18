@@ -4,7 +4,8 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class TestKitchen < FlavorBase
+      include ChefGen::Snippet::CookbookBase
       include ChefGen::Snippet::TestKitchen
 
       # :nocov:
@@ -31,13 +32,14 @@ RSpec.describe ChefGen::Snippet::TestKitchen do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
   %w(test test/integration test/integration/default
      test/integration/default/serverspec
      test/integration/default/serverspec/recipes).each do |dname|
     it "should create the directory #{dname}" do
       expect(@recipe).to receive(:directory).with(%r{#{dname}$})
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::TestKitchen.new(@recipe)
       template.generate
     end
   end
@@ -47,27 +49,27 @@ RSpec.describe ChefGen::Snippet::TestKitchen do
     .each do |fname|
     it "should add a template for #{fname}" do
       expect(@recipe).to receive(:template).with(%r{#{fname}$})
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::TestKitchen.new(@recipe)
       template.generate
     end
   end
 
   it 'should add the testkitchen gems' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::TestKitchen.new(@recipe)
     template.generate
     expect(template.cookbook_gems.keys).to include('test-kitchen')
     expect(template.cookbook_gems.keys).to include('kitchen-vagrant')
   end
 
   it 'should add the testkitchen rake tasks' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::TestKitchen.new(@recipe)
     template.generate
     expect(template.rake_tasks.keys).to include('testkitchen')
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'test_kitchen'
     ChefGen::Flavors.path
   end
 end

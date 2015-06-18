@@ -4,7 +4,7 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class CookbookBase < FlavorBase
       include ChefGen::Snippet::CookbookBase
 
       # :nocov:
@@ -30,19 +30,20 @@ RSpec.describe ChefGen::Snippet::CookbookBase do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
   %w(Gemfile Rakefile Berksfile Guardfile README.md
      CHANGELOG.md metadata.rb).each do |fname|
     it "should add a template for #{fname}" do
       expect(@recipe).to receive(:template).with(/#{fname}$/)
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::CookbookBase.new(@recipe)
       template.generate
     end
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'cookbook_base'
     ChefGen::Flavors.path
   end
 end

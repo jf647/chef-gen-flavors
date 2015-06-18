@@ -4,7 +4,8 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class ChefSpec < FlavorBase
+      include ChefGen::Snippet::CookbookBase
       include ChefGen::Snippet::ChefSpec
 
       # :nocov:
@@ -31,11 +32,12 @@ RSpec.describe ChefGen::Snippet::ChefSpec do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
   %w(spec spec/recipes).each do |dname|
     it "should create the directory #{dname}" do
       expect(@recipe).to receive(:directory).with(%r{#{dname}$})
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::ChefSpec.new(@recipe)
       template.generate
     end
   end
@@ -43,13 +45,13 @@ RSpec.describe ChefGen::Snippet::ChefSpec do
   %w(.rspec spec/spec_helper.rb spec/recipes/default_spec.rb).each do |fname|
     it "should add a template for #{fname}" do
       expect(@recipe).to receive(:template).with(%r{#{fname}$})
-      template = ChefGen::Flavor::Awesome.new(@recipe)
+      template = ChefGen::Flavor::ChefSpec.new(@recipe)
       template.generate
     end
   end
 
   it 'should add the chefspec gems' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::ChefSpec.new(@recipe)
     template.generate
     expect(template.cookbook_gems.keys).to include('chefspec')
     expect(template.cookbook_gems.keys).to include('guard-rspec')
@@ -57,20 +59,20 @@ RSpec.describe ChefGen::Snippet::ChefSpec do
   end
 
   it 'should add the chefspec rake tasks' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::ChefSpec.new(@recipe)
     template.generate
     expect(template.rake_tasks.keys).to include('chefspec')
   end
 
   it 'should add the chefspec guard sets' do
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::ChefSpec.new(@recipe)
     template.generate
     expect(template.guard_sets.keys).to include('chefspec')
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'chef_spec'
     ChefGen::Flavors.path
   end
 end

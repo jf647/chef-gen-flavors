@@ -4,7 +4,7 @@ require 'chef_gen/snippets'
 
 module ChefGen
   module Flavor
-    class Awesome < FlavorBase
+    class GitInit < FlavorBase
       include ChefGen::Snippet::GitInit
 
       # :nocov:
@@ -31,16 +31,17 @@ RSpec.describe ChefGen::Snippet::GitInit do
   include ChefDKGeneratorContext
   include DummyRecipe
   include StdQuiet
+  include ResetPlugins
 
   it 'should execute git init' do
     expect(@recipe).to receive(:execute).with('initialize git repo')
-    template = ChefGen::Flavor::Awesome.new(@recipe)
+    template = ChefGen::Flavor::GitInit.new(@recipe)
     template.generate
   end
 
   it 'should copy snippet contents' do
     ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Awesome'
+    ENV['CHEFGEN_FLAVOR'] = 'git_init'
     ChefGen::Flavors.path
   end
 end
