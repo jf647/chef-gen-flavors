@@ -71,6 +71,7 @@ begin
   Kitchen::RakeTasks.new
 rescue
   puts 'test-kitchen initialization failed; disabling kitchen tasks'
+  task 'kitchen:all'
 end
 task integration: 'kitchen:all'
 END
