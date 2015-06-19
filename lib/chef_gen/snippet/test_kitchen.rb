@@ -70,8 +70,10 @@ begin
   require 'kitchen/rake_tasks'
   Kitchen::RakeTasks.new
 rescue
-  puts 'test-kitchen initialization failed; disabling kitchen tasks'
-  task 'kitchen:all'
+  desc 'placeholder Test Kitchen task when plugins are missing'
+  task 'kitchen:all' do
+    puts 'test-kitchen plugins not installed; this is a placeholder task'
+  end
 end
 task integration: 'kitchen:all'
 END

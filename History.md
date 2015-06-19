@@ -1,5 +1,9 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.3
+
+* TestKitchen snippet: give the dummy task created when TK cannot initalize (e.g. vagrant not installed) a description so it shows up in the output of 'rake -T'
+
 ## 0.8.2
 
 * TestKitchen snippet: require the TK rake tasks inside the rescue block so that if we blow up because vagrant isn't installed, we can recover
