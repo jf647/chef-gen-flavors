@@ -50,7 +50,7 @@ RSpec.describe ChefGen::FlavorBase do
     template.generate
   end
 
-  it 'creates files conditionally with the clobber check enabled', :focus do
+  it 'creates files conditionally with the clobber check enabled' do
     include FakeFS::SpecHelpers
 
     expect(@recipe).to receive(:directory).once
