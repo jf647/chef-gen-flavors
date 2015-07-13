@@ -35,7 +35,7 @@ module ChefGen
           'pry-byebug' => '~> 3.1',
           'pry-rescue' => '~> 1.4',
           'pry-stack_explorer' => '~> 0.4',
-          'berkshelf' => '~> 3.2',
+          'berkshelf' => '~> 3.3',
           'guard' => '~> 2.12'
         }
       end

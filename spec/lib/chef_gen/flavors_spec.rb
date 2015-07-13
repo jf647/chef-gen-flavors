@@ -77,7 +77,7 @@ RSpec.describe ChefGen::Flavors do
     to_disregard.each do |plugin|
       ChefGen::Flavors.disregard_plugin plugin
     end
-    expect { ChefGen::Flavors.path }.to raise_error
+    expect { ChefGen::Flavors.path }.to raise_error(RuntimeError)
   end
 
   it 'should use the builtin flavor as an option with the env var set' do
@@ -93,7 +93,8 @@ RSpec.describe ChefGen::Flavors do
 
   it 'should raise an error if the plugin has no description' do
     ENV['CHEFGEN_FLAVOR'] = 'Baz'
-    expect { ChefGen::Flavors.path }.to raise_error
+    expect { ChefGen::Flavors.path }.to raise_error(
+      NameError, /^undefined method/)
   end
 
   it 'should default the code_generator path' do
