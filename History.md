@@ -1,5 +1,10 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.4
+* Specify minimum `berkshelf` version of '3.3' in generated Gemfile. Berkshelf
+3.3+ support `no_proxy` env var so you can download from Public and private
+supermarket sources in your Berksfile.
+
 ## 0.8.3
 
 * TestKitchen snippet: give the dummy task created when TK cannot initalize (e.g. vagrant not installed) a description so it shows up in the output of 'rake -T'

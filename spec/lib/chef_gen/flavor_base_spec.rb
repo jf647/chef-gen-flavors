@@ -56,14 +56,14 @@ RSpec.describe ChefGen::FlavorBase do
     expect(@recipe).to receive(:directory).once
     expect(@recipe).not_to receive(:cookbook_file)
     expect(File).to receive(:exist?)
-      .with('/nonexistent/foo/README.md')
+      .with(%r{/nonexistent/foo/README.md})
       .and_return(true)
     template = ChefGen::Flavor::Amazing.new(@recipe)
     template.fail_on_clobber = true
     template.files << 'README.md'
     expect { template.generate }
       .to output(/tried to overwrite file.+README\.md/).to_stderr
-      .and raise_error
+       .and raise_error(RuntimeError)
   end
 
   it 'creates files conditionally with the clobber check disabled' do
@@ -93,14 +93,14 @@ RSpec.describe ChefGen::FlavorBase do
     expect(@recipe).to receive(:directory).once
     expect(@recipe).not_to receive(:template)
     expect(File).to receive(:exist?)
-      .with('/nonexistent/foo/README.md')
+      .with(%r{/nonexistent/foo/README.md})
       .and_return(true)
     template = ChefGen::Flavor::Amazing.new(@recipe)
     template.fail_on_clobber = true
     template.templates << 'README.md'
     expect { template.generate }
       .to output(/tried to overwrite file.+README\.md/).to_stderr
-      .and raise_error
+      .and raise_error(RuntimeError)
   end
 
   it 'creates templates conditionally with the clobber check disabled' do
