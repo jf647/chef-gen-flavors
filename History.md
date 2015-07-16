@@ -1,5 +1,10 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.5
+
+* pin to Aruba 0.6.x because of the incompatible changes in subprocess working directories introduced in 0.7
+* revert 'current_dir' change in 0.8.4, which was only required due to upgrading Aruba
+
 ## 0.8.4
 * Specify minimum `berkshelf` version of '3.3' in generated Gemfile. Berkshelf
 3.3+ support `no_proxy` env var so you can download from Public and private

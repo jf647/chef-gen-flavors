@@ -1,14 +1,14 @@
 # -*- encoding: utf-8 -*-
-# stub: chef-gen-flavors 0.8.3.20150619073155 ruby lib
+# stub: chef-gen-flavors 0.8.5.20150716103945 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "chef-gen-flavors"
-  s.version = "0.8.3.20150619073155"
+  s.version = "0.8.5.20150716103945"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["James FitzGibbon"]
-  s.date = "2015-06-19"
+  s.date = "2015-07-16"
   s.description = "chef-gen-flavors is a framework for creating custom templates for the\n'chef generate' command provided by ChefDK.\n\nThis gem simply provides a framework; templates are provided by separate\ngems, which you can host privately for use within your organization or\npublicly for the Chef community to use.\n\nAt present this is focused primarily on providing templates for generation of\ncookbooks, as this is where most organization-specific customization takes place.\nSupport for the other artifacts that ChefDK can generate may work, but is not\nthe focus of early releases."
   s.email = ["james.i.fitzgibbon@nordstrom.com"]
   s.extra_rdoc_files = ["ARUBA_STEPS.md", "History.md", "Manifest.txt", "README.md"]
@@ -38,7 +38,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, ["~> 0.9"])
       s.add_development_dependency(%q<simplecov-console>, ["~> 0.2"])
       s.add_development_dependency(%q<yard>, ["~> 0.8"])
-      s.add_development_dependency(%q<aruba>, ["~> 0.6"])
+      s.add_development_dependency(%q<aruba>, ["~> 0.6.2"])
       s.add_development_dependency(%q<rspec_junit_formatter>, ["~> 0.2"])
       s.add_development_dependency(%q<fakefs>, ["~> 0.6"])
     else
@@ -57,7 +57,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<simplecov>, ["~> 0.9"])
       s.add_dependency(%q<simplecov-console>, ["~> 0.2"])
       s.add_dependency(%q<yard>, ["~> 0.8"])
-      s.add_dependency(%q<aruba>, ["~> 0.6"])
+      s.add_dependency(%q<aruba>, ["~> 0.6.2"])
       s.add_dependency(%q<rspec_junit_formatter>, ["~> 0.2"])
       s.add_dependency(%q<fakefs>, ["~> 0.6"])
     end
@@ -77,7 +77,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<simplecov>, ["~> 0.9"])
     s.add_dependency(%q<simplecov-console>, ["~> 0.2"])
     s.add_dependency(%q<yard>, ["~> 0.8"])
-    s.add_dependency(%q<aruba>, ["~> 0.6"])
+    s.add_dependency(%q<aruba>, ["~> 0.6.2"])
     s.add_dependency(%q<rspec_junit_formatter>, ["~> 0.2"])
     s.add_dependency(%q<fakefs>, ["~> 0.6"])
   end
