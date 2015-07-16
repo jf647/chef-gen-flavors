@@ -22,7 +22,10 @@ begin
     extra_dev_deps << ['simplecov', '~> 0.9']
     extra_dev_deps << ['simplecov-console', '~> 0.2']
     extra_dev_deps << ['yard', '~> 0.8']
-    extra_dev_deps << ['aruba', '~> 0.6']
+    # aruba 0.7 and higher have completely changed subprocess
+    # working dirs and I've not yet found how to make it work
+    # with our feature tests
+    extra_dev_deps << ['aruba', '~> 0.6.2']
     extra_dev_deps << ['rspec_junit_formatter', '~> 0.2']
     extra_dev_deps << ['fakefs', '~> 0.6']
   end
