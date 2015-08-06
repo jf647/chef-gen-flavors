@@ -1,5 +1,26 @@
 # Changelog for chef-gen-flavors
 
+## 0.8.6
+
+This version contains no code changes; this is a courtesy version bump
+because breaking API changes are coming in v0.9.x.  If you have a flavor
+that derives from ChefGen::FlavorBase, you may want to pin to '~> 0.8.6'
+to insulate yourself from these changes.
+
+A brief synopsis of what's planned:
+
+* extract FlavorBase from this gem into it's own distribution
+  * possibly extract the standard snippets into their own distribution as well for those who want the framework without anything extra
+* change the way snippets are added to flavors to be by declaration rather than composition (i.e. you'll call something like `::mixin(Snippet)` rather than `include Snippet`)
+
+These changes are to support guaranteed ordering of snippet contents.
+Right now if you want everything that say ChefGen::Snippet::TestKitchen
+provides but want to override just the .kitchen.yml file, you have to do
+silly tricks where your replacement template is added by a method that
+lexically sorts after `content_testkitchen_files`.  This is not a solid
+design, and I'm taking the opportunity to fix it while we're still at
+major version 0.
+
 ## 0.8.5
 
 * pin to Aruba 0.6.x because of the incompatible changes in subprocess working directories introduced in 0.7
