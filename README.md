@@ -7,6 +7,11 @@
 * code climate :: [![Code Climate](https://codeclimate.com/github/Nordstrom/chef-gen-flavors/badges/gpa.svg)](https://codeclimate.com/github/Nordstrom/chef-gen-flavors)
 * docs :: [![Inline docs](http://inch-ci.org/github/nordstrom/chef-gen-flavors.svg?branch=master)](http://inch-ci.org/github/nordstrom/chef-gen-flavors)
 
+## UPCOMING API CHANGES
+
+Please see the [changelog](History.md) for details of upcoming breaking API changes in
+the 0.9.x series.
+
 ## DESCRIPTION
 
 chef-gen-flavors is a framework for creating custom templates for the
