@@ -1,5 +1,10 @@
 # Changelog for chef-gen-flavors
 
+## 0.9.0
+
+* removed ChefGen::FlavorBase (and the snippets it uses) from this distribution and moved into a separate gem: [chef-gen-flavor-base](https://github.com/jf647/chef-gen-flavor-base)
+* the new flavor base has breaking API changes (details below); flavor authors should refer to the documentation in the new distribution for details
+
 ## 0.8.6
 
 This version contains no code changes; this is a courtesy version bump
