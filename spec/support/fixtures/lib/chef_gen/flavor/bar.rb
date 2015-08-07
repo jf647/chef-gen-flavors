@@ -1,20 +1,23 @@
 module ChefGen
   module Flavor
     class Bar
-      class << self
-        def description
-          'bar cookbook template'
-        end
+      NAME = 'bar'
+      DESC = 'bar cookbook template'
 
-        def code_generator_path(classfile)
+      def initialize(temp_path:)
+        @temp_path = temp_path
+      end
+
+      def add_content
+        FileUtils.cp_r(
           File.expand_path(
             File.join(
-              classfile,
-              '..', '..', '..', '..',
-              'code_generator_2'
+              File.dirname(__FILE__),
+              '..', '..', '..', 'shared', 'flavor', NAME
             )
-          )
-        end
+          ) + '/.',
+          @temp_path
+        )
       end
     end
   end

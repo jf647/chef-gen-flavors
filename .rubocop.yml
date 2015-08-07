@@ -23,5 +23,6 @@ Lint/UnusedMethodArgument:
     - 'lib/chef_gen/snippet/*.rb'
 
 Metrics/LineLength:
+  Max: 100
   Exclude:
     - 'lib/chef_gen/flavors/cucumber/*.rb'
