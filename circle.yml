@@ -2,6 +2,8 @@
 machine:
   ruby:
     version: 2.2.0
+  pre:
+    - gem install bundler -v 1.10.6
 test:
   override:
     - mkdir -p $CIRCLE_TEST_REPORTS/cucumber $CIRCLE_TEST_REPORTS/rspec

@@ -15,7 +15,6 @@ RSpec.describe ChefGen::Flavors do
   end
 
   it 'should load the expected plugins' do
-    ChefGen::Flavors.disregard_plugin :amazing, :awesome
     expect(ChefGen::Flavors.plugins.keys).to(
       include(:foo, :bar, :baz)
     )
@@ -89,41 +88,5 @@ RSpec.describe ChefGen::Flavors do
     end
     expect(ChefGen::Flavors).not_to receive(:prompt_for_plugin)
     ChefGen::Flavors.path
-  end
-
-  it 'should raise an error if the plugin has no description' do
-    ENV['CHEFGEN_FLAVOR'] = 'Baz'
-    expect { ChefGen::Flavors.path }.to raise_error(
-      NameError, /^undefined method/)
-  end
-
-  it 'should default the code_generator path' do
-    ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Foo'
-    expect(FileUtils).to receive(:cp_r).with(
-      %r{spec/support/fixtures/code_generator$}, String
-    )
-    ChefGen::Flavors.path
-  end
-
-  it 'should respect an overridden code_generator path' do
-    ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Bar'
-    expect(FileUtils).to receive(:cp_r).with(
-      %r{spec/support/fixtures/code_generator_2$}, String
-    )
-    ChefGen::Flavors.path
-  end
-
-  it 'should copy the code_generator to a temp directory' do
-    ChefGen::Flavors.disregard_plugin :baz
-    ENV['CHEFGEN_FLAVOR'] = 'Foo'
-    tmpdir = Dir.tmpdir
-    expect(FileUtils).to receive(:cp_r).with(
-      %r{spec/support/fixtures/code_generator$},
-      %r{#{tmpdir}/chefgen_flavor\..+$}
-    )
-    expect(ChefGen::Flavors.path)
-      .to match(%r{#{tmpdir}/chefgen_flavor\..+$})
   end
 end
