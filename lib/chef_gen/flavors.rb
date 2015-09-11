@@ -8,7 +8,7 @@ module ChefGen
   # a plugin framework for creating ChefDK generator flavors
   class Flavors
     # the version of the gem
-    VERSION = '0.9.0'
+    VERSION = '0.9.1'
 
     extend LittlePlugger path: 'chef_gen/flavor',
                          module: ChefGen::Flavor
@@ -28,7 +28,7 @@ module ChefGen
         $stdout.puts "using ChefGen flavor '#{selected}'"
 
         # return early if we're using the builtin flavor
-        return nil if :builtin == selected
+        return chefdk_generator_cookbook_path if :builtin == selected
 
         # get a temp dir
         tmpdir = create_tmpdir(selected)
@@ -61,7 +61,7 @@ module ChefGen
       def plugin_from_env
         if ENV.key?('CHEFGEN_FLAVOR')
           candidate = ENV['CHEFGEN_FLAVOR'].downcase.to_sym
-          return candidate if plugins.key?(candidate)
+          return candidate if @plugins.key?(candidate)
         end
         nil
       end
@@ -135,6 +135,17 @@ module ChefGen
         descr
       end
       # :nocov:
+
+      # return the path to the code_generator cookbook that comes with ChefDK
+      # @return [String] the path to the code_generator cookbook
+      # @api private
+      def chefdk_generator_cookbook_path
+        require 'rubygems'
+        spec = Gem::Specification.find_by_name('chef-dk')
+        File.join(
+          spec.gem_dir, 'lib', 'chef-dk', 'skeletons', 'code_generator'
+        )
+      end
     end
   end
 end
