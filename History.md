@@ -1,5 +1,9 @@
 # Changelog for chef-gen-flavors
 
+## 0.9.1
+
+* fix bug that prevented using CHEFDK_FLAVOR=1 in ENV to get the built-in code generator
+
 ## 0.9.0
 
 * removed ChefGen::FlavorBase (and the snippets it uses) from this distribution and moved into a separate gem: [chef-gen-flavor-base](https://github.com/jf647/chef-gen-flavor-base)

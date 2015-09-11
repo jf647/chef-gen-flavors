@@ -1,15 +1,15 @@
 # -*- encoding: utf-8 -*-
-# stub: chef-gen-flavors 0.9.0.20150904171033 ruby lib
+# stub: chef-gen-flavors 0.9.1.20150911132844 ruby lib
 
 Gem::Specification.new do |s|
   s.name = "chef-gen-flavors"
-  s.version = "0.9.0.20150904171033"
+  s.version = "0.9.1.20150911132844"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["James FitzGibbon"]
-  s.date = "2015-09-05"
-  s.description = "chef-gen-flavors is a framework for creating custom templates for the\n'chef generate' command provided by ChefDK.\n\nThis gem simply provides a framework; templates are provided by separate\ngems, which you can host privately for use within your organization or\npublicly for the Chef community to use.\n\nAt present this is focused primarily on providing templates for generation of\ncookbooks, as this is where most organization-specific customization takes place.\nSupport for the other artifacts that ChefDK can generate may work, but is not\nthe focus of early releases."
+  s.date = "2015-09-11"
+  s.description = "chef-gen-flavors is a framework for creating custom templates for the\n'chef generate' command provided by ChefDK.\n\nThis gem simply provides a framework; templates are provided by separate\ngems, which you can host privately for use within your organization or\npublicly for the Chef community to use.\n\n[chef-gen-flavor-base](https://github.com/jf647/chef-gen-flavor-base) is\na base class that makes it easy to compose a flavor from reusable\nsnippets of functionality, and using it is highly recommended.  Using\nchef-gen-flavors on its own is only suitable if you already have a\ntemplate which is a copy of the skeleton provided by ChefDK.\n\nAt present this is focused primarily on providing templates for\ngeneration of cookbooks, as this is where most organization-specific\ncustomization takes place. Support for the other artifacts that ChefDK\ncan generate may work, but is not the focus of early releases."
   s.email = ["james@nadt.net"]
   s.extra_rdoc_files = ["ARUBA_STEPS.md", "History.md", "Manifest.txt", "README.md"]
   s.files = ["ARUBA_STEPS.md", "History.md", "LICENSE", "Manifest.txt", "README.md", "chef-gen-flavors.gemspec", "lib/chef_gen/flavor.rb", "lib/chef_gen/flavors.rb", "lib/chef_gen/flavors/cucumber.rb", "lib/chef_gen/flavors/cucumber/bundle.rb", "lib/chef_gen/flavors/cucumber/chefdk.rb", "lib/chef_gen/flavors/cucumber/kitchen.rb", "lib/chef_gen/flavors/cucumber/knife.rb", "lib/chef_gen/flavors/cucumber/rake.rb", "lib/chef_gen/flavors/cucumber/regex.rb"]
